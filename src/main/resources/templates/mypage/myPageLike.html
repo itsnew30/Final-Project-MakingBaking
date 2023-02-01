@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+<head>
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+			$(function() {			
+			
+				$(".present").on('click', function(e) {
+						$(e.target).css("color", "white");
+				});
+				
+				$(document).on('click', ".deletebtn", function(e){
+					console.log($(this).attr("data-like-no"));
+					const likeNo = $(this).attr("data-like-no");
+					const pageNum = $(this).attr("data-page-num");
+					
+					if(confirm("찜 목록에서 삭제하시겠습니까?")) {
+						$.ajax({
+							url: '/mypage/mypageUnlike',
+							type: 'delete',
+							data: {
+								likeNo: likeNo,
+								cateName: $(".cateName").val()
+							},
+							success: function(){
+								fnCallAjax(pageNum);										
+							},
+							error: function(e){
+								console.log(e);
+							}
+						});
+					}
+				});
+				
+				$(document).on("click", ".pagination_button a", function(e) {
+					e.preventDefault();
+					const page = $(this).attr("href");
+					$(".deletebtn").attr("data-page-num", page);
+					fnCallAjax(page);
+					
+					/*.done(function(result) {
+						$("#list-table").replaceWith(result);
+					});*/
+				});
+			});
+			
+			function fnCallAjax(page) {
+				$.ajax({
+						url: '/mypage/myLikeList',
+						type: 'post',
+						data: {	
+							page: page						
+						},
+						success: function(obj) {
+							console.log(obj);
+							
+							let htmlstr = "";
+							
+							if(obj.pageItems.content.length == 0) {
+									htmlstr += `
+										<p class="noReser"><span class="noReserStatus">찜한 내역이 없습니다.</span></p>
+									`;
+									$("#boxxWrapper").html(htmlstr);
+							}
+							
+							else {
+							
+								for(let i = 0; i < obj.pageItems.content.length; i++) {
+									htmlstr += `
+										<div class="boxx">
+											<input type="hidden" name="likeNo" class="likeNo" value="${obj.pageItems.content[i].likeNo}">
+			        						<input type="hidden" name="cateName" class="cateName" value="${obj.pageItems.content[i].cateName}">
+										      	<div class="imgWrapper">
+									`;
+										
+									          
+									   if(obj.pageItems.content[i].cateName == 'item') {
+											htmlstr += `
+											
+													<img src="/item/${obj.pageItems.content[i].fileName}" width="130px" margin="10px">
+										      	</div>
+										        <div class="box_product">
+													  <a class="box_product_detail" href="/item/item/${obj.pageItems.content[i].likeNo}">${obj.pageItems.content[i].likeName}</a>
+											`;
+										} else if (obj.pageItems.content[i].cateName == 'class') {
+											htmlstr += `
+													<img src="/dayclass/${obj.pageItems.content[i].fileName}" width="130px" margin="10px">
+										      	</div>
+										        <div class="box_product">
+												  <a class="box_product_detail" href="/dayclass/dayclass/${obj.pageItems.content[i].likeNo}">${obj.pageItems.content[i].likeName}</a>
+											`;
+										}
+									    htmlstr += `
+										     	</div>
+										        <div class="box_right">
+										          <span class="box_right_detail">
+										          	<a href="#" class="deletebtn" data-like-no="${obj.pageItems.content[i].likeNo}"
+										          		data-page-num="${obj.pageItems.pageable.pageNumber}">
+										          		<img src="/etc/like.png" width="30px" margin="10px"></img>
+										          	</a>
+										          </span>
+										        </div>
+										    </div>
+									`;
+								}
+							
+								$("#boxxWrapper").html(htmlstr);
+							}
+							
+							htmlstr = "";
+							
+							let pageNumber = obj.pageItems.pageable.pageNumber;
+							let pageSize = obj.pageItems.pageable.pageSize;
+							let totalPages = obj.pageItems.totalPages;
+							let startPage = Math.floor((pageNumber / pageSize) * pageSize + 1);
+							let tempEndPage = startPage + pageSize - 1;
+							let endPage = tempEndPage > totalPages ? totalPages : tempEndPage;
+							
+							console.log(pageNumber);
+							console.log(pageSize);
+							console.log(totalPages);
+							console.log(startPage);
+							console.log(tempEndPage);
+							console.log(endPage);
+							
+							if(pageNumber > 0) {
+								htmlstr += `
+									<li class="pagination_button">
+										<a style="border: 0px;" href="${pageNumber - 1}">&#60;</a>
+									</li>
+								`;
+							}
+							
+							let realStart = totalPages - startPage < pageSize ? 
+												totalPages < pageSize ? 1 : totalPages - pageSize + 1 
+											: startPage;
+							
+							for(let i = realStart; i <= endPage; i++) {
+								if(pageNumber == i-1) {
+									htmlstr += `<li class="pagination_button">
+											   	   <a class="present" href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								} else {
+									htmlstr += `<li class="pagination_button">
+											   	   <a href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								}
+							}
+							
+							if(pageNumber < totalPages - 1) {
+								htmlstr += `<li class="pagination_button">
+										       <a style="border: 0px;" href="${pageNumber + 1}">&#62;</a>
+									        </li>
+								`;
+							}
+							
+							$(".pagination").html(htmlstr);
+							
+							
+						},
+						error: function(e) {
+							console.log(e);
+							console.log($(e.target).attr("data-page-num"));
+						}
+					});
+			}
+		</script>
+	</th:block>
+	<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/myPage/myPage.css}"/>
+	</th:block>
+</head>
+<body>
+	<div layout:fragment="content" style="height: 75vh;">
+		<main class="centre">
+	    <!-- 사이드 바 -->
+	    <div class="left-nav-bar">
+	      <div class="mypage2">
+	        <h2><a href="/mypage/myPage">마이페이지<a></h2>
+	      </div>
+	      <div class="menu">
+	        <div class="sub-menu">
+	          <h3>My 쇼핑</h3>
+	          <ul class="menu-group">
+	            <li class="menu-name"><a th:href="@{/mypage/myPage}">주문/취소확인</a></li>
+	            <li class="menu-name"><a th:href="@{/mypage/myReserList}">예약/취소확인</a></li>
+	            <li class="menu-name"><a th:href="@{/mypage/myLikeList}">찜목록</a></li>
+	          </ul>
+	        </div>
+	        <div class="sub-menu">
+	          <ul class="menu-group">
+	            <h3>My 활동</h3>
+	            <li class="menu-name"><a th:href="@{/mypage/myRvwList}">나의 리뷰</a></li>
+	          </ul>
+	        </div>
+	        <div class="sub-menu">
+	          <ul class="menu-group">
+	            <h3>My 정보</h3>
+	            <li class="menu-name"><a th:href="@{/user/changeInfoPw}">개인정보확인</a></li>
+	            <li class="menu-name"><a th:href="@{/mypage/quit}">회원탈퇴</a></li>
+	          </ul>
+	        </div>
+	        <div class="sub-menu">
+	          <ul class="menu-group">
+	            <li style="list-style: none;"><a th:href="@{/mypage/qnaList}"><h3>나의 QnA</h3></a></li>
+	          </ul>
+	        </div>
+	      </div>
+	    </div>
+	    <!-- 메인 내용 -->
+	    <div class="mainContentWrapper">
+		    <div class="main-content">
+		      <h2>나의 찜 목록</h2>
+		      <form id="deleteForm" enctype="multipart/form-data">
+		      <div id="boxxWrapper">
+			      <div class="boxx" th:each="like : ${pageLikeList}">
+			      	<input type="hidden" name="likeNo" class="likeNo" th:value="${like.likeNo}">
+			        <input type="hidden" name="cateName" class="cateName" th:value="${like.cateName}">
+			      	<div class="imgWrapper">
+			          <img th:src="@{${like.cateName} == 'class' ? '/dayclass/' + ${like.fileName} : '/item/' + ${like.fileName}}">
+			      	</div>
+			        <div class="box_product">
+			          <a class="box_product_detail" th:if="${like.cateName eq 'item'}" th:text="${like.likeName}" th:href="@{/item/item/{likeNo} (likeNo=${like.likeNo})}"></a>
+			          <a class="box_product_detail" th:if="${like.cateName eq 'class'}" th:text="${like.likeName}" th:href="@{/dayclass/dayclass/{likeNo} (likeNo=${like.likeNo})}"></a>
+			        </div>
+			        <div class="box_right">
+			          <span class="box_right_detail">
+			          	<a href="#" class="deletebtn" th:data-like-no="${like.likeNo}"
+			          	   th:data-page-num="${pageLikeList.pageable.pageNumber}">
+			          	  <img src="/etc/like.png" width="30px" margin="10px"></img>
+			          	</a>
+			          </span>
+			        </div>
+			      </div>
+		      </div>
+		      </form>
+		      <p class="noReser" th:if="${#lists.size('pageLikeList') == 0}"><span class="noReserStatus">찜한 목록이 없습니다.</span></p>
+		    </div>
+		  	<div class="paging" style="text-align:center;">
+				<ul class="pagination" th:if="${pageLikeList.totalElements > 0}"
+									   th:with="pageNumber = ${pageLikeList.pageable.pageNumber},
+												pageSize = ${pageLikeList.pageable.pageSize},
+												totalPages = ${pageLikeList.totalPages},
+												startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+												tempEndPage = ${startPage + pageSize - 1},
+												endPage = ${tempEndPage > totalPages ? totalPages : tempEndPage}">
+					<li class="pagination_button" th:if="${pageNumber > 0}">
+						<a style="border: 0px;" th:href="${pageNumber - 1}">&#60;</a>
+					</li>
+				
+					<li class="pagination_button" th:each="page : ${#numbers.sequence(totalPages - startPage < pageSize ? (totalPages < pageSize ? 1 :totalPages - pageSize + 1) : startPage, endPage)}">
+						<a th:href="${page - 1}" th:text="${page}"></a>
+					</li>
+				
+					<li class="pagination_button" th:if="${pageNumber < totalPages - 1}">
+						<a style="border: 0px;" th:href="${pageNumber + 1}">&#62;</a>
+					</li>
+				</ul>
+			</div>
+	    </div>
+	  </main>
+	</div>
+</body>
+</html>

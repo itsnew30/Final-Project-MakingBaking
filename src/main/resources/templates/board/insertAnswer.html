@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout}">
+<head> <!-- 관리자 Q&A 답변 작성 페이지 -->
+  <th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/board/insertBoard.css}"/>
+  </th:block> 
+</head>
+<body>
+<div layout:fragment="content">
+	<div id="container" style="height: 100%; margin: 100px auto 200px;">
+	  <div id="high-container">
+	    <div id="mid-container">
+	      <div id="question-title">
+	        <h3 th:text="${getBoard.boardTitle}"></h3>
+	      </div>
+	      <div id="question-content">
+	        <p th:text="${getBoard.boardContent}"></p>
+	      </div>
+	      <hr>
+	      <form id="insertNotice" th:action="@{/board/qna/answer/{cateCode}/{boardNo} (cateCode=${getBoard.cateCode}, boardNo=${getBoard.boardNo})}" method="post" enctype="multipart/form-data">
+		      <div id="content-container">
+		        <textarea name="boardContent" id="answer_boardContent" cols="30" rows="10"></textarea>
+		      </div>
+		      <div id="btn-container">
+		        <div id="left-btn">
+		          <input type="button" id="listbtn" value="목록">
+		        </div>
+		        <div id="right-btn">
+		          <input type="submit" id="insertbtn" value="등록">
+		        </div>
+		      </div> 
+	      </form>     
+	    </div>
+	  </div>
+	</div>
+</div>
+</body>
+</html>

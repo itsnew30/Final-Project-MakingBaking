@@ -1,0 +1,91 @@
+/* 아이템 */
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 10rem auto 3rem;
+	flex-direction: column;
+}
+
+.boxx {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid lightgray;
+  width: 55rem;
+  height: 210px;
+  position: relative;
+  margin-bottom: 10px;
+}
+.card {
+  width: 270px;
+  height: 190px;
+}
+.card_img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.box_img {
+  margin-right: 20px;
+}
+.container .boxx img {
+  padding: 25px 10px 10px 10px;
+  width:17rem;
+}
+.box_product {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 4rem 2rem;
+  height: 50%;
+}
+.box_product_detail {
+  margin: 14px 5px 5px 5px;
+  font-size: 1.5rem;
+}
+.box_product_detail2{
+	margin: 13px 5px 5px 5px;
+}
+.container .boxx .box_product .box_product_detail a {
+	color:black;
+	font-weight: 600;
+}
+.container .boxx .box_product .box_product_detail a:hover{
+	color: #28693F;
+	
+}
+.box_right {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: space-between;
+  font-size: 1.5rem;
+}
+
+.box_right_detail_b {
+  position: absolute;
+  bottom: 15px;
+  right: 50px;
+}
+.currency {
+	position: absolute;
+	bottom: 15px;
+  	right: 25px;
+}
+#more {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.show-more {
+  margin-top: 20px;
+  border: none;
+  background-color: rgba(0,0,0,0);
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+#topBtn {
+  position: fixed;
+  right: 23rem;
+  bottom: 17rem;
+  display: none;
+}

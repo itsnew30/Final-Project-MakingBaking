@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	  
+	<!-- head 영역 시작 -->
+	<!-- 개별적으로 사용할 css, js 링크를 걸기 위해서 남겨둠 -->
+	<head>
+		<th:block layout:fragment="css">
+			<style>
+				input {
+					border: 1px solid #DCDCDC;
+				}
+				input[type="text"] {
+					padding-left: 5px;
+				}
+				hr {
+					height: 1px;
+					background: black;
+				}
+				#order_title {
+				    font-size: 40px;
+				}
+				.orderStatus {
+					color: red;
+					font-weight: 600;
+				}
+				#top {
+				    clear: both;
+				    margin-top: 90px;
+				}
+				#top+hr {
+					margin-top: 10px;
+				}
+				#top .orderStatus {
+					margin-left: 20px;
+				}
+				#list_title {
+				    font-size: 0.9em;
+				}
+				#list_title .title_itemInfo {
+				    margin-left: 100px;
+				}
+				#list_title .title_itemPrice {
+				    margin-left: 605px;
+				}
+				#list_title .title_itemQuantity {
+				    margin-left: 118px;
+				}
+				#list_title .title_totalPrice {
+				    margin-left: 135px;
+				}
+				#list_title+hr {
+					margin-bottom: 15px;
+				}
+				.item_Img {
+				    margin-left: 30px;
+				    width: 100px;
+				}
+				.item_Detail {
+				    display: inline-block;
+				    width: 55%;
+				    vertical-align: middle;
+				}
+				.detailName {
+				    display: inline-block;
+				    margin-left: 10px;
+				    vertical-align: top;
+				}
+				.item_Price {
+				    display: inline-block;
+				    width: 12%;
+				    text-align: right;
+				}
+				.item_Quantity {
+				    display: inline-block;
+				    width: 11%;
+				    text-align: right;
+				}
+				.item_totalPrice {
+				    display: inline-block;
+				    width: 15%;
+				    text-align: right;
+				}
+				#totalPrice {
+				    float: right;
+				    font-size: 0.9em;
+				    margin-bottom: 8px;
+				    margin-right: 5px;
+				}
+				#totalPrice+hr {
+				    clear: both;
+				}
+				.itemView+hr {
+					margin-top: 15px;
+					margin-bottom: 5px;
+				}
+				#delivery {
+				    margin-top: 100px;
+				}
+				#delivery .deliInfo {
+					display: inline-block;
+				    margin-bottom: 10px;
+				    font-size: 22px;
+				}
+				.table-wrap {
+				    display: flex;
+				}
+				table {
+				    border-spacing: 3px 13px;
+				    text-align: left;
+				}
+				table td {
+				    padding-left: 10px;
+				}
+				table>caption {
+					margin-top: 10px;
+				    text-align: left;
+				}
+				#delivery #T1 {
+				    display: inline-block;
+				    margin-left: 5px;
+				}
+				#recipient {
+				    width: 120px;
+				    height: 25px;
+				}
+				#addr1 {
+				    width: 70px;
+				    height: 26px;
+				    margin-right: 10px;
+				    margin-bottom: 5px;
+				}
+				#btnZipcode {
+					width: 100px;
+				    height: 26px;
+				    vertical-align: middle;
+				    cursor: pointer;
+				}
+				#addr2 {
+				    margin-bottom: 5px;
+				}
+				#addr2, #addr3 {
+				    width: 400px;
+				    height: 25px;
+				}
+				#extraAddr {
+				    width: 200px;
+				    height: 25px;
+				}
+				#reciTel1, #reciTel2, #reciTel3 {
+				    width: 50px;
+				    height: 25px;
+				}
+				textarea {
+					border: 1px solid #DCDCDC;
+					resize: none;
+					padding: 2px;
+				}
+				#delivery #T2 {
+				    display: inline-block;
+				    margin-left: 100px;
+				}
+				#T2 tr {
+				    height: 30px;
+				}
+				#orderer {
+				    width: 120px;
+				    height: 25px;
+				}
+				#orderTel1, #orderTel2, #orderTel3 {
+				    width: 50px;
+				    height: 25px;
+				}
+				#orderMail {
+				    height: 25px;
+				}
+				#delivary+hr {
+				    clear: both;
+				}
+				#CancelOption {
+				    margin-top: 100px;
+				    margin-bottom: 10px;
+				    text-align: center;
+				}
+				#btns {
+				    margin: 15px 0 20px 40px;
+				}
+				#btnOrderCancel, #btnPayCancel {
+				    width: 150px;
+				    height: 35px;
+				}
+				#bankPayment {
+					display: none;
+				    margin-left: 40px;
+				}
+				#bank {
+					width: 100px;
+					height: 25px;
+				    vertical-align: middle;
+				}
+				#accountNo1 {
+				    margin-left: 15px;
+				    width: 200px;
+				    height: 25px;
+				    vertical-align: middle;
+				}
+				#depositorTitle {
+				    margin-top: 15px;
+				}
+				#depositor {
+				    width: 150px;
+				    height: 25px;
+				    vertical-align: middle;
+				    margin-left: 5px;
+				}
+				input[type="button"] {
+					cursor: pointer;
+					font-size: 17px;					
+					border: 1.5px solid #28693F;
+ 					border-radius: 4px;
+ 					background-color: white;
+ 					color: #28693F;
+ 					letter-spacing:1px
+				}
+				input[type="button"]:hover {
+					color: white;
+					background: #28693F;
+				}
+				#moveList {
+					display: flex;
+					justify-content: center;	
+				    margin-top: 100px;
+				    margin-bottom: 10px;
+					width: 100%;
+					height: 25px;	
+				}
+				#btnMoveList {
+					width: 150px;
+				    height: 35px;
+				    text-align: center;
+					cursor: pointer;
+					font-size: 17px;
+					border: 1.5px solid #28693F;
+ 					border-radius: 4px;
+ 					background-color: white;
+ 					color: #28693F;
+ 					letter-spacing:1px
+				}
+				#btnMoveList:hover {
+					color: white;
+					background: #28693F;
+				}
+			</style>
+		</th:block>
+		<th:block layout:fragment="script">
+			<script th:inline="javascript">
+				const order = /*[[${order}]]*/;
+				const itemList = /*[[${item}]]*/;
+				$(function() {
+					if(order.orderStatus == 'MV') {
+						$(".orderStatus").text("입금대기");
+					} else if(order.orderStatus == 'PE') {
+						$(".orderStatus").text("결제완료");
+					} else if(order.orderStatus == 'OC') {
+						$(".orderStatus").text("주문취소");
+					} else if(order.orderStatus == 'PC') {
+						$(".orderStatus").text("결제취소");
+					} else if(order.orderStatus == 'DW') {
+						$(".orderStatus").text("배송준비중");
+					} else if(order.orderStatus == 'D') {
+						$(".orderStatus").text("배송중");
+					} else if(order.orderStatus == 'DC') {
+						$(".orderStatus").text("배송완료");
+					}
+					
+					let orderNo = order.orderNo;
+					
+					console.log(typeof String(orderNo)); // number
+					console.log(String(orderNo).substring(0,8)); // 20230102000029
+					let DateYMD = String(orderNo).substring(0,8); // 20230102
+					let orderDateYear = DateYMD.substr(0,4); // 2023
+					let orderDateMonth = DateYMD.substr(4,2); // 01
+					let orderDateDate = DateYMD.substr(6,2); // 02
+					let orderDate = orderDateYear + "/" + orderDateMonth + "/" + orderDateDate; // 2023-01-02
+					console.log(new Date(orderDate)); // Mon Jan 02 2023 09:00:00 GMT+0900 (한국 표준시)
+					let orderD = new Date(orderDate);
+					orderD.setDate(orderD.getDate()+1);
+					let deadline = orderD.toLocaleDateString('ko-KR', {
+					    year: 'numeric',
+					    month: 'long',
+					    day: 'numeric',
+					});
+					console.log(deadline);
+					$(".deadline").text(deadline);
+					
+					
+					$("#btnOrderCancel").on('click', function() {						
+						if(confirm("주문을 취소하시겠습니까?")) {
+							$.ajax({
+								url: '/order/orderCancel/' + order.orderNo,
+								type: 'put',
+								data: { 
+									orderDate: order.orderDateStr,
+									orderStatus: 'OC',
+									reciName: order.reciName,
+									reciTel: order.reciTel,
+									shippingAddr1: order.shippingAddr1,
+									shippingAddr2: order.shippingAddr2,
+									shippingAddr3: order.shippingAddr3,
+									orderDeliFee: order.orderDeliFee,
+									orderTotalPrice: order.orderTotalPrice,
+									orderPayment: order.orderPayment,
+									orderName: order.orderName,
+									orderTel: order.orderTel,
+									orderMessage: order.orderMessage,
+									orderMail: order.orderMail,
+									depositor: order.depositor,
+									orderTotalPayPrice: order.orderTotalPayPrice
+									},
+								success: function(obj) {
+									console.log(obj);
+									$(".orderStatus").text("주문취소");
+									$("#CancelOption").css("display", "none");
+									$("#moveList").show();
+									$(".deadlineMent").hide();
+									$(".deadline").hide();	
+									$(".deadlineTime").hide();	
+									
+									let htmlstr = "";
+									
+									htmlstr += `									
+										<span class="cancelDateMent" style="color: black; font-weight: 400;">취소일시: </span>
+										<span class="cancelDate" style="color: black; font-weight: 400;">${obj.item.getOrder.orderCancelDate.substring(0, 10)} ${obj.item.getOrder.orderCancelDate.substring(11, 16)}</span>
+									`;
+									
+									$("#top").append(htmlstr);
+								}, error: function(e) {
+									console.log(e);
+								}
+							});							
+							alert("주문이 취소되었습니다.");							
+						} else {
+							alert("주문취소가 취소되었습니다.");
+						}						
+					});
+					
+					$("#btnPayCancel").on('click', function() {
+						
+						if(confirm("결제를 취소하시겠습니까?")) {
+							$.ajax({
+								url: `/order/payCancel`,
+								type: 'post',
+								data: { 
+									orderNo: order.orderNo,
+									orderDate: order.orderDateStr,
+									orderStatus: 'PC',
+									reciName: order.reciName,
+									reciTel: order.reciTel,
+									shippingAddr1: order.shippingAddr1,
+									shippingAddr2: order.shippingAddr2,
+									shippingAddr3: order.shippingAddr3,
+									orderDeliFee: order.orderDeliFee,
+									orderTotalPrice: order.orderTotalPrice,
+									orderPayment: order.orderPayment,
+									orderName: order.orderName,
+									orderTel: order.orderTel,
+									orderMessage: order.orderMessage,
+									orderMail: order.orderMail,
+									depositor: order.depositor,
+									orderTotalPayPrice: order.orderTotalPayPrice,
+									tid: order.tid,
+									itemList: JSON.stringify(itemList)
+									},
+								success: function(obj) {
+									console.log(obj);
+									$(".orderStatus").text("결제취소");
+									$("#CancelOption").css("display", "none");
+									$("#moveList").show();
+									$(".deadlineMent").hide();
+									$(".deadline").hide();									
+									$(".deadlineTime").hide();									
+									
+									let htmlstr = "";
+									
+									htmlstr += `									
+										<span class="cancelDateMent" style="color: black; font-weight: 400;">취소일시: </span>
+										<span class="cancelDate" style="color: black; font-weight: 400;">${obj.canceled_at.substring(0, 10)} ${obj.canceled_at.substring(11, 16)}</span>
+									`;
+									$("#top").append(htmlstr);
+								}, error: function(e) {
+									console.log(e);
+								}
+							});							
+							alert("결제가 취소되었습니다.");							
+						} else {
+							alert("결제취소가 취소되었습니다.");
+						}
+					});
+						
+				});	
+				
+				function fnBtnMoveList() {
+					window.location.href = '/mypage/myPage'
+				}
+				
+				function fnBtnMoveAdminList() {
+					window.location.href = '/admin/orderItemList'
+				}			
+			</script>
+		</th:block>
+	</head>
+	<!-- head 영역 끝 -->
+	
+	<body>
+		<div layout:fragment="content">
+			<div id="container">
+	            <h1 id="order_title">주문 확인</h1>
+	            <div id="top">
+	                <span class="orderNoMent">주문번호: </span><span class="realOrderNo" th:text="${order.orderNo}"></span><span class="orderStatus"></span>&ensp;
+	                <span class="cancelDateMent" th:if="${order.orderCancelDate != null}">취소일시: </span><span class="cancelDate" th:if="${order.orderCancelDate != null}" th:text="${#strings.substring(order.orderCancelDate, 0, 16)}"></span>
+	                <span class="deadlineMent" th:if="${order.orderStatus} == 'MV'">입금기한: </span><span class="deadline" th:if="${order.orderStatus} == 'MV'"></span><span class="deadlineTime" th:if="${order.orderStatus} == 'MV'"> 오후 11시 59분 59초</span>
+	            </div>
+	            <hr>
+	            <div id="list_title">
+	                <span class="title_itemInfo">상품정보</span><span class="title_itemPrice">상품금액</span><span class="title_itemQuantity">수량</span><span class="title_totalPrice">합계금액</span>
+	            </div>
+	            <hr> 
+	            <div id="order_item">
+	                <div class="itemView" th:each="item : ${item}">
+	                    <div class="item_Detail">
+	                        <img class="item_Img" th:src="@{'/item/' + ${item.fileName}}">
+	                        <div class="detailName" th:text="${item.itemName}"></div>    
+	                    </div>
+	                    <div class="item_Price"><span class="itemPrice" th:text="${#numbers.formatInteger(item.itemPrice, 3, 'COMMA')}"></span></div><span>원</span>  
+	                    <div class="item_Quantity" th:text="${item.orderItemCnt}"></div>                    
+	                    <div class="item_totalPrice"><span th:text="${#numbers.formatInteger((T(java.lang.Integer).parseInt(item.itemPrice) * T(java.lang.Integer).parseInt(item.orderItemCnt)), 3, 'COMMA')}"></span></div><span>원</span>
+	                </div>            
+	                <hr>
+	                <div id="totalPrice">
+	                    <span>상품 총 금액: </span> <span class="item_PriceSum" th:text="${#numbers.formatInteger(order.orderTotalPrice, 3, 'COMMA')}"></span><span >원</span> <span>&#43;</span> 
+	                    <span>배송비: </span> <span class="deliFee" th:text="${order.orderDeliFee >= 1000 ? #numbers.formatInteger(order.orderDeliFee, 3, 'COMMA') : order.orderDeliFee}"></span><span >원</span> <span>&#61;</span> 
+	                    <span>총 결제금액: </span> <span class="totalPrice" th:text="${#numbers.formatInteger(order.orderTotalPayPrice, 3, 'COMMA')}"></span><span >원</span>
+	                </div>
+	                <hr>
+	            </div>          
+	            <div id="delivery">
+	                <p class="deliInfo">배송정보</p>
+	                <hr>
+	                <div class="table-wrap">                    
+	                    <table id="T1">
+	                        <tr>
+	                            <th>수령인</th>
+	                            <td><input type="text" name="reciName" id="recipient" th:value="${order.reciName}" readonly></td>
+	                        </tr>
+	                        <tr>
+	                            <th>배송주소</th>
+	                            <td>
+	                                <input type="text" name="shippingAddr1" id="addr1" placeholder="우편번호" th:value="${order.shippingAddr1}" readonly>
+	                                <input type="text" name="shippingAddr2" id="addr2" placeholder="주소" th:value="${order.shippingAddr2}" readonly><br>
+	                                <input type="text" name="shippingAddr3" id="addr3" placeholder="상세주소" th:value="${order.shippingAddr3}" readonly>
+	                            </td>
+	                        </tr>
+	                        <tr>
+	                            <th>휴대폰</th>
+	                            <td>
+	                                <input type="text" name="reciTel1" id="reciTel1" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="4" th:value="${(order.reciTel).substring(0,3)}" readonly> -
+	                                <input type="text" name="reciTel2" id="reciTel2" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="4" th:value="${(order.reciTel).substring(4,8)}" readonly> - 
+	                                <input type="text" name="reciTel3" id="reciTel3" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="4" th:value="${(order.reciTel).substring((order.reciTel).length-4)}" readonly>
+	                            </td>
+	                        </tr>
+	                        <tr>
+	                            <th style="vertical-align: top;">배송메세지</th>
+	                            <td>
+	                                <textarea name="orderMessage" id="message" cols="50" rows="8" maxlength="200" th:text="${order.orderMessage}" readonly></textarea>
+	                            </td>
+	                        </tr>
+	                    </table>
+	                    <table id="T2">
+	                        <caption>주문자 정보</caption>
+	                        <tr>
+	                            <th>주문자</th>
+	                            <td><input type="text" name="orderName" id="orderer" th:value="${order.orderName}" readonly></td>
+	                        </tr>
+	                        <tr>
+	                            <th>휴대폰</th>
+	                            <td>
+	                                <input type="text" name="orderTel1" id="orderTel1" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="4" th:value="${(order.orderTel).substring(0,3)}" readonly> -
+	                                <input type="text" name="orderTel2" id="orderTel2" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="4" th:value="${(order.orderTel).substring(4,8)}" readonly> - 
+	                                <input type="text" name="orderTel3" id="orderTel3" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="4" th:value="${(order.orderTel).substring((order.orderTel).length-4)}" readonly>
+	                            </td>
+	                        </tr>
+	                        <tr>
+	                            <th>이메일</th>
+	                            <td><input type="text" name="orderMail" id="orderMail" th:value="${order.orderMail}" readonly></td>
+	                        </tr>
+	                        <tr></tr>
+	                        <tr></tr>
+	                        <tr></tr>
+	                    </table>                   
+	                </div>
+	            </div>
+	            <hr>
+	            <div id="CancelOption" th:if="${order.cancelEnable == 'P'}">
+	            	<button type="button" id="btnMoveList" sec:authorize="hasRole('ROLE_ADMIN')" onclick="fnBtnMoveAdminList()">목록으로</button>&emsp;
+	            	<button type="button" id="btnMoveList" sec:authorize="hasRole('ROLE_USER')" onclick="fnBtnMoveList()">목록으로</button>&emsp;
+                    <input type="button" name="CancelOption" id="btnOrderCancel" value="주문취소" th:if="${order.orderStatus == 'MV'}">
+                    <input type="button" name="CancelOption" id="btnPayCancel" value="결제취소" th:if="${order.orderStatus == 'PE'}">
+	            </div>
+	            <div id="moveList" th:style="${order.orderStatus == 'PC' || order.orderStatus == 'OC' || order.orderStatus == 'DW' || order.orderStatus == 'D' || order.orderStatus == 'DC' ? 'display: flex; 
+					justify-content: center;	
+				    margin-top: 100px;
+				    margin-bottom: 10px;
+					width: 100%;
+					height: 25px;' : 'display: none;'}">
+	            	<button type="button" id="btnMoveList" sec:authorize="hasRole('ROLE_ADMIN')" onclick="fnBtnMoveAdminList()">목록으로</button>
+	            	<button type="button" id="btnMoveList" sec:authorize="hasRole('ROLE_USER')" onclick="fnBtnMoveList()">목록으로</button>
+	            </div>
+	        </div>
+		</div>
+	</body>
+</html>

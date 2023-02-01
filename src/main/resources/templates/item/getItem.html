@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	  
+	<!-- head 영역 시작 -->
+	<!-- 개별적으로 사용할 css, js 링크를 걸기 위해서 남겨둠 -->
+	<head>
+		<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/item.css}">
+		</th:block>
+		
+		<th:block layout:fragment="script">
+		<script th:inline="javascript" th:src="@{/js/jquery-ui.min.js}"></script>
+			<script th:inline="javascript">
+				let cartClick = false;
+				const getItem = /*[[${item}]]*/;
+				const principal = /*[[${#authentication.principal}]]*/;
+				const reviewChkList = /*[[${reviewChkList}]]*/;
+				
+				$(function() {
+		
+					// 취소환불 문의 자세히 보기
+					$(".refundGuideBtn").on("click", function(){
+						if($("#refundGuide").css("display") == "none") {
+							$("#refundGuide").css("display", "block");	
+							$(".refundGuideBtn").text("자세히 보기 ▲");	
+						} else {
+							$("#refundGuide").css("display", "none");
+							$(".refundGuideBtn").text("자세히 보기 ▼");	
+						}
+						
+					});
+					
+					$(".cancelGuideBtn").on("click", function(){
+						if($("#cancelGuide").css("display") == "none") {
+							$("#cancelGuide").css("display", "block");		
+							$(".cancelGuideBtn").text("자세히 보기 ▲");						
+						} else {
+							$("#cancelGuide").css("display", "none");
+							$(".cancelGuideBtn").text("자세히 보기 ▼");	
+						}
+						
+					});
+					
+					// 비회원이 메뉴바-후기 클릭시 로그인창
+					$(".m_rvw_a").on("click", function(){
+						const isAuthenticated = $(".header > input[name='authenticate']").val();
+                  	
+		                  if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+		                     $('.login-form-container').toggleClass('active');
+		                  } else { // 아니면 예약페이지 위치로 이동
+							  $('html').animate({scrollTop : offset.top}, 300);
+						  }
+					})
+					// 후기작성 안내문구
+					for(let i = 0; i < reviewChkList.length; i++) {
+						if(reviewChkList[i].orderStatus == 'DC' && reviewChkList[i].reviewYn == 'N') {
+							$("#orderStatusText").text("작성할 상품을 선택해주세요.");
+							break;
+						} else {
+							$("#orderStatusText").text("작성할 상품이 없습니다.");
+						}
+					}
+					
+					// 비회원이 리뷰 작성 버튼 클릭시
+					$("#it_rvw_writeBtn").on("click", function(){
+						
+					var offset = $("#item_hr2").offset();
+                  	const isAuthenticated = $(".header > input[name='authenticate']").val();
+                  	
+		                  if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+		                     $('.login-form-container').toggleClass('active');
+		                  } else { // 아니면 예약페이지 위치로 이동
+							  $('html').animate({scrollTop : offset.top}, 300);
+						  }
+					});
+					
+					$("#rvwContentText").on("keyup", function(e) {
+						console.log($("#rvwContentText").val());
+						$("#rvwContent").val($("#rvwContentText").val());
+					});
+					
+					
+					if(getItem.itemStock == 0 || getItem.itemStatus == 'S') {
+						$(".itemPrice").css("text-decoration", "line-through").css("text-decoration-color", "#B40431");
+						$(".itemPriceKrw").css("text-decoration", "line-through").css("text-decoration-color", "#B40431");
+						$(".itemStatus").text("일시품절").css("color", "#B40431");
+					} else if(getItem.itemStatus == 'N') {
+						$(".itemPrice").css("text-decoration", "line-through").css("text-decoration-color", "#B40431");
+						$(".itemPriceKrw").css("text-decoration", "line-through").css("text-decoration-color", "#B40431");
+						$(".itemStatus").text("판매중지").css("color", "#B40431");
+					}
+					
+					// 비회원이 장바구니 버튼 클릭시 로그인창 띄우기
+					$("#itemCartBtn").on("click", function() {
+						const isAuthenticated = $(".header > input[name='authenticate']").val();
+						if(isAuthenticated == "false") {
+							$('.login-form-container').toggleClass('active');
+						} else {
+							if(getItem.itemStock == 0 || getItem.itemStatus == 'S') {
+								alert("상품이 일시품절되었습니다.");
+								return;
+							} else if(getItem.itemStatus == 'N') {
+								alert("상품이 판매중지되었습니다.");
+								return;
+							}
+							
+							if(!cartClick) {
+								$.ajax({
+									url: '/cart/insertCart',
+									type: 'post',
+									data: { itemNo: $("#itemNo").val() },
+									success: function(obj) {
+										console.log(obj);
+										cartClick = true;
+										alert("장바구니에 상품이 추가되었습니다.");
+									}, error: function(e) {
+										console.log(e);
+									}
+								});							
+							} else {
+								alert("장바구니는 1초에 한 번씩 클릭 가능합니다.");	
+								console.log('noclick');
+								setTimeout(function() {
+									cartClick = false;
+								}, 1000);
+							}							
+						}
+					});
+					
+					
+					const customUser = /*[[${#authentication.principal}]]*/;
+					
+
+					if(customUser != null) {
+						// 좋아요 버튼 클릭시
+						$("#itemLikeBtn").on("click", function(e) {
+							
+							const isAuthenticated = $(".header > input[name='authenticate']").val();
+							if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+		                     $('.login-form-container').toggleClass('active');
+		                  	} 
+						  
+							if($(this).val() == 'Y') {
+							$.ajax({
+								url: '/item/like',
+								type: 'delete',
+								data: {itemNo: $("#itemNo").val()},
+								success: function(obj) {
+									console.log(obj);
+									$("#itemLikeBtn").text("🤍    " + obj.item.likeCnt);
+									$("#itemLikeBtn").val("N");
+								},
+								error: function(e) {
+									console.log(e);
+								}
+							});
+						} else {
+							$.ajax({
+								url: '/item/like',
+								type: 'post',
+								data: {itemNo: $("#itemNo").val()},
+								success: function(obj) {
+									console.log(obj);
+									$("#itemLikeBtn").text("❤    " + obj.item.likeCnt);
+									$("#itemLikeBtn").val("Y");
+								},
+								error: function(e) {
+									console.log(e);
+								}
+							});
+						}
+						});
+					}
+					
+					
+					// 리뷰 등록
+					$("#it_rvw_writeBtn").on("click", function(){
+						console.log($("#rvwContent").val());
+						
+						if( ! $("input[name='rvwScore']:checked").val()){
+							 alert('별점을 선택해주세요.');
+							 return;
+						} 
+						if( ! $("#rvwContent").val()){
+							 alert('리뷰를 작성해주세요.');
+							 return;
+						} 
+						
+						$.ajax({
+							url: '/item/insertItemRvw',
+							type:'post',
+							data:{
+								rvwReferNo: $("#itemNo").val(),
+								rvwContent: $("#rvwContent").val(),
+								rvwScore: $("input[name='rvwScore']:checked").val(),
+								rvwOrderNo: $("#rvwOrderNo").val(),
+								rvwType: 'item'
+							}, success: function(obj) {
+								console.log(obj);
+								location.reload();
+								alert("리뷰가 등록되었습니다.");
+								
+							}, error: function(e) {
+								console.log(e);
+								alert("리뷰 등록에 실패하였습니다.");
+							}
+						});	
+							
+					}); 
+					
+					// 리뷰 글자 제한
+					$('#rvwContentText').keyup(function (e) {
+						let content = $(this).val();
+					    
+					    // 글자수 세기
+					    if (content.length == 0 || content == '') {
+					    	$('.textCount').text('0자');
+					    } else {
+					    	$('.textCount').text(content.length + '자');
+					    }
+					    
+					    // 글자수 제한
+					    if (content.length > 150) {
+					    	// 150자 부터는 타이핑 되지 않도록
+					        $(this).val($(this).val().substring(0, 150));
+					        // 150자 넘으면 알림창 뜨도록
+					        alert('글자수는 150자까지 입력 가능합니다.');
+					    };
+					});
+					
+					//
+					$("#it_rvw_array").on("change", function() {
+						reviewPagingAndOrder(0, $("#it_rvw_array").val());
+					});
+					
+					// 리뷰 페이징
+					$(".paging_btn a").on("click", function(e) {
+						e.preventDefault();
+						reviewPagingAndOrder($(e.target).attr("href"), $("#it_rvw_array").val());
+					});
+					
+					// 수업날짜 클릭시 리뷰창 나타내기
+					$("input[name='reviewOrderNo']").on("click", function() {
+						$(".rvwWriteSection").css("display", "block");
+						$("#rvwOrderNo").val($(this).val());
+					});
+					
+					// 클래스 후기 textarea반응형	
+					$('.it_cDetatils_text').each(function() {
+					    var offset = this.offsetHeight - this.clientHeight;
+					 
+					    var resizeTextarea = function(el) {
+					        $(el).css('height', 'auto').css('height', el.scrollHeight + offset);
+					    };
+					    
+					    resizeTextarea(this);
+					});
+				});
+				
+				// ??????????
+				function reviewPagingAndOrder(page, condition) {
+					console.log(page);
+					console.log(condition);
+
+						$.ajax({
+						url: '/item/item/' + $("#itemNo").val(),
+						type: 'post',
+						data: {
+							page: page,
+							searchCondition: condition
+						},
+						success: function(obj) {
+							console.log(obj);
+							
+							let htmlStr = "";
+							
+							for(let i=0; i<obj.pageItems.content.length; i++) {
+								htmlStr += `
+									<tr>
+			                          <td>
+			                          	<span>`;
+			                          	for(let j = 0; j < obj.pageItems.content[i].rvwScore; j++) {
+											htmlStr += `⭐`;
+										  }
+								htmlStr +=  `</span>
+		                          	  </td>
+			                          <td>${obj.pageItems.content[i].rvwContent}</td>
+			                          <td>${obj.pageItems.content[i].rvwRegdate.substring(0,10)}</td>
+			                          <td>${principal != 'anonymousUser' && principal.user.userRole == 'ROLE_ADMIN' 
+			                         	   ? obj.pageItems.content[i].rvwWriter 
+			                         	   : obj.pageItems.content[i].rvwWriter.substring(0, obj.pageItems.content[i].rvwWriter.length - 3) + '***'}</td>
+			                        </tr>
+								`;
+							}
+							
+							$(".it_rvw_list tbody").html(htmlStr);
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					}); 
+					
+					
+				}; 
+			</script>
+		</th:block>
+	</head>
+	<!-- head 영역 끝 -->
+	<body>
+	<div layout:fragment="content">
+	  <div class="entire-wrap" >	  
+	  <div class="item">
+	    <main > 
+	    <form id="itemForm"  method="post">	 
+	    <input type="hidden" id="itemNo" name="itemNo" th:value="${item.itemNo}">  
+	      <section> 
+	        <div class="it_banner_container">
+	          <div class="it_banner"> 
+	            <div class="itbanner_mainImg">
+	              <img class="itbanner_main_img" th:src="@{'/item/' + ${itemImgList.get(0).fileName}}"
+	              width="400px" hegiht="300px">
+	            </div>
+	            <div class="itbanner_explain">   
+	              <div class="item_h2">     
+	                <h2 th:text="${item.itemName}"></h2>
+	              </div>
+	              <div class="itbanner_explain_sTitle">
+	                <p th:text="${item.itemMinName}" name="소제목"></p>
+	              </div>
+		          <div class="itbanner_explain_KRW">
+		            <span th:text="${#numbers.formatInteger(item.itemPrice, 3, 'COMMA')}" class="itemPrice"></span><span class="itemPriceKrw">원</span>
+		            <span class="itemStatus"></span>
+		          </div> 
+		          <div class="it_explainList_div">
+		              <table class="it_explainList_T">
+		              	<tr>
+		              	  <th class="it_explainList">원산지</th>
+		              	  <td th:text="${item.itemOrigin}"></td>		 
+		              	</tr>
+		              	<tr>
+		              	  <th class="it_explainList">유통기한</th>
+		              	  <td th:text="${item.itemExpDate}"></td>		              	  
+		              	</tr>
+		              	<tr>
+		              	  <th class="it_explainList">알레르기 정보</th>
+		              	  <td th:text="${item.itemAllergyInfo}"></td>
+		              	</tr>
+		              </table>
+		          </div>
+		          <div class="itbanner_explain_btn">	             
+		      		<span><button type="button" id="itemCartBtn" value="itemCart">장바구니  
+		            </button></span>
+		            <span id="likeSpan"><button type="button" id="itemLikeBtn" 
+		            	th:value="${likeYn}" th:text="${likeYn == 'Y' ? '❤   ' : '🤍   '} + ${likeCnt}"></button></span>
+	              </div>   
+		        </div>
+		       </div>
+	         </div>
+	       </section>       
+	     </form>
+
+	      <section class="it_menu">
+	        <div class="itmenu">
+	          <ul >
+	            <li><a th:href="@{#itemIntro}"
+	              class="m_intro_a">상품설명</a></li>
+	            <li><a th:href="@{#item_hr1}" 
+	              class="m_apply_a">상세정보</a></li>
+	            <li><a th:href="@{#item_hr2}" 
+	              class="m_rvw_a">상품후기</a></li>
+	            <li><a th:href="@{#item_hr3}" 
+	              class="m_cancel_a">취소/환불</a></li>
+	          </ul>
+	        </div>    
+	      </section>
+	      <section>
+	        <div class="it_contents_container">
+	          <div class="it_contents">
+	          	<h3 class="it_cintro_title" th:text="${item.itemName}" name="상품설명"></h3>
+	            <div class="it_cintro" id="itemIntro" >
+	              
+	              <textarea class="it_cDetatils_text" th:text="${item.itemDetails}" readonly></textarea>
+	              
+	            </div>
+	            <hr id="item_hr1" class="item_hr">
+	            <h3 class="it_cDetatils_title">영양정보</h3>
+	            <div class="it_cDetatils" id="itemDetails">
+				  <img th:each="itemImg : ${itemImgList}" class="it_cDetatils_main_img" th:if="${itemImg.fileName.contains('영양정보')}" th:src="@{'/item/' + ${itemImg.fileName}}"
+		              width="350px">
+    
+	            </div>
+	          
+	            <hr id="item_hr2" class="item_hr">
+	           	 
+	              <h3 class="it_rvw_title" >상품후기</h3>    
+				   <div th:if="${!#lists.isEmpty(reviewChkList)}" class="it_rvw" id="itemReview">        
+	              	<div class="it_rvw_write_member">	   	            
+	              		<form class="it_rvw_write_form" action="/item/insertItemRvw" method="post">	              			             			
+						 	<div class="rvw_orderInfo">
+	              			
+	              				<p id="orderStatusText"></p>
+	              			
+	              			</div>
+						 	<div class="rvw_orderNo" th:each="reviewChk : ${reviewChkList}">
+						 		<span th:if="${reviewChk.orderStatus == 'DC' && reviewChk.reviewYn == 'N'}">
+							 		<input type="radio" name="reviewOrderNo" th:value="${reviewChk.orderNo}"
+							 			   th:id="'radio' + ${reviewChk.orderNo}">
+							 		<label th:for="'radio' + ${reviewChk.orderNo}"
+							 			   th:text="'주문 날짜 : ' + ${reviewChk.orderDate eq null ? '' : #strings.substring(reviewChk.orderDate, 0 ,10)}"></label>
+						 		</span>
+						 	</div>	
+	             			<input type="hidden" id="rvwContent" name="rvwContent">
+	             			<input type="hidden" id="rvwOrderNo" name="rvwOrderNo">
+	             			<div class="rvwWriteSection" style="display: none;">    			
+		              			<div class="star-wrapper">
+			              			<fieldset>
+										<input type="radio" name="rvwScore" value="5" class="rvwScore" id="rate1"><label
+											for="rate1">★</label>
+										<input type="radio" name="rvwScore" value="4" class="rvwScore" id="rate2"><label
+											for="rate2">★</label>
+										<input type="radio" name="rvwScore" value="3" class="rvwScore" id="rate3"><label
+											for="rate3">★</label>
+										<input type="radio" name="rvwScore" value="2" class="rvwScore" id="rate4"><label
+											for="rate4">★</label>
+										<input type="radio" name="rvwScore" value="1" class="rvwScore" id="rate5"><label
+											for="rate5">★</label>
+									</fieldset>	    			
+									<div class="textLength" >
+								      <p class="textCount">0자</p>
+								      <p class="textTotal">/150자</p>
+								 	</div>
+							 	</div>
+		              			<textarea class="rvwContentText" id="rvwContentText" placeholder=" 로그인 후 후기를 리뷰해주세요."></textarea>	              			
+		              			<div class="writeBtn_div"> 
+		              			  <button class="it_rvw_writeBtn" id="it_rvw_writeBtn" type="button">등록</button>
+		              			</div>
+	             			</div>
+	              		</form>
+	              	</div>
+				   </div>
+	        
+	              		<div class="it_rvw_wirte_detail" id="classReviewList">
+		                <div id="itemReviewList">
+		                  <div class="it_rvw_option"> 
+		                    <select name="it_rvw_array" id="it_rvw_array">
+		                      <option value="NEW" th:selected="${searchCondition == '' || searchCondition == 'NEW'}">최신순</option>
+		                      <option value="OLD" th:selected="${searchCondition == 'OLD'}">오래된순</option>
+		                      <option value="HIGH" th:selected="${searchCondition == 'HIGH'}">평점 높은순</option>
+							  <option value="LOW" th:selected="${searchCondition == 'LOW'}"> 평점 낮은순</option>	                    
+		                    </select>
+		                  </div>
+		                  <span>
+		                    <table class="it_rvw_list">
+		                      <colgroup>
+		                        <col width="140">
+		                        <col width="">
+		                        <col width="130">
+		                        <col width="120">
+		                      </colgroup>
+		                      <thead>
+		                        <tr>
+		                          <th scope="col">평점</th>
+		                          <th scope="col">내 용</th>
+		                          <th scope="col">작성일자</th>
+		                          <th scope="col">작성자</th>
+		                        </tr>
+		                      </thead>
+		                      <tbody>                 
+		                      	<tr th:each="review : ${pageReviewList}">
+		                          <td>
+		                          	<span th:each="num : ${#numbers.sequence(1, review.rvwScore)}">⭐</span>
+	                          	  </td>
+		                          <td th:text="${review.rvwContent}"></td>
+		                          <td th:text="${review.rvwRegdate eq null ? '' : #strings.substring(review.rvwRegdate, 0, 10)}"></td>
+		                          <td sec:authorize="hasRole('ROLE_ADMIN')" th:text="${review.rvwWriter}"></td>
+		                          <td sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${review.rvwWriter.length() > 4 ? review.rvwWriter.substring(0, review.rvwWriter.length()-3) + '***' : review.rvwWriter}"></td>
+		                        </tr> 
+		                      </tbody>
+		                    </table>
+		                </div>
+	                    </div>
+	                    <div class="it_rvw_pasing">
+	                      <ul class="paging" style="display: flex; justify-content: center;" 
+							th:if="${pageReviewList.totalElements > 0}"
+							th:with="pageNumber = ${pageReviewList.pageable.pageNumber},
+												pageSize = ${pageReviewList.pageable.pageSize},
+												totalPages = ${pageReviewList.totalPages},
+												startPage =${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+												tempEndPage = ${startPage + pageSize -1}, 
+												endPage = ${tempEndPage > totalPages ? totalPages : tempEndPage}">
+								<li class="paging_btn" th:if="${pageNumber > 0}">
+									<a th:href="@{${pageNumber - 1}}">◀</a>
+								</li>
+								<li class="paging_btn" th:each="page : ${#numbers.sequence(startPage, endPage)}">
+									<a th:href="@{${page - 1}}" th:text="${page}"></a>
+								</li>
+								<li class="paging_btn" th:if="${pageNumber < totalPages - 1}">
+									<a th:href="@{page=${pageNumber + 1}}">▶</a>
+								</li>
+							</ul> 		
+	                    </div>
+	                  </span>	                
+	              
+	            </div>
+	          </div>
+	          <hr id="item_hr3" class="item_hr">
+	          <div class="c_cancel" id="itemCancle" >
+	            <h3 class="c_cancel_title">취소/환불</h3>
+	            <p class="c_cancel_text_A">궁금하신 점이나 서비스 이용에 불편한 점이 있으신가요?</p>
+	            <p class="c_cancel_text_B">문제가 되는 부분을 사진을 찍어 아래 중 편하신 방법으로 접수해 주시면 
+	              빠르게 도와드리겠습니다.</p>
+	          </div>
+	          <div class="c_Qna">
+	            <ul style="padding-left: 0;">
+	              <li>
+	                <strong>| 전화 문의</strong>
+	                <p class="c_Qna_text_A">
+	                  월~금요일 오전 9시 - 오후 6시<br>
+	                  주말/공휴일 오전 9시 - 오후 3시
+	                </p>
+	              </li>
+	              <li>
+	                <strong>| 홈페이지 문의</strong>
+	                <p class="c_Qna_text_B">
+	                  365일<br>
+	                  로그인 > 마이페이지 > 1:1 문의
+	                </p>
+	                <p class="c_Qna_text_C">
+	                  고객센터 운영 시간에 순차적으로 답변해드리겠습니다.
+	                </p>
+	              </li>
+	            </ul>
+	          </div>
+	          <div class="c_guide">
+	            <div class="c_refundGuide">
+	              <strong class="c_refundG_title">교환 및 환불 안내</strong>
+	              <p class="c_refundG_text">교환 및 환불이 필요하신 경우 고객센터로 문의해주세요.</p>
+	              <button type="button" class="refundGuideBtn">자세히 보기 ▼</button>
+	            </div>
+	            <div id="refundGuide">			       
+		            <div class="c_refundG_01">
+		              <strong class="c_refundG_01title">01. 상품에 문제가 있는 경우</strong>
+		              <p class="c_refundG_01text_A">받으신 상품이 표시/광고/내용 또는 계약과 다른 경우에는 상품을 받은 날부터 1개월 이내,
+		              그 사실을 알게 된 날부터 14일 이내에 교환 및 환불을 요청하실 수 있습니다.
+		              
+		              <span class="c_refundG_01text_B">※ 배송 상품에 문제가 있는 것으로 확인되면 배송비는 MakingBaking이 부담합니다.</span>
+		              </p>
+		            </div>
+		            <div class="c_refundG_02">
+		              <strong class="c_refundG_02title">02. 단순 변심, 주문 착오의 경우</strong>
+		              <p class="c_refundG_02text">
+		              	<strong class="c_refundG_02text_A">실온/냉장 식품</strong><br>
+		              	재판매가 불가한 상품의 특성상, 단순변심, 주문 착오 시 교환 및 반품이 어려운 점 양해 부탁드립니다.
+		              	상품에 따라 조금씩 맛이 다를 수 있으며, 개인의 기호에 따라 같은 상품도 다르게 느끼실 수 있습니다.			              	
+		              	
+		              	<strong class="c_refundG_02text_B">유통기한 30일 이상 식품</strong><br>
+		              	상품을 받은 날부터 7일 이내 관리자에게 문의해주세요.
+		              	
+		              	<span>※ 단순 변심으로 인한 배송 상품 교환 또는 환불의 경우 고객님께서 배송비 6,000원을 부담하셔야 합니다.(주문건 배송비를 결제하셨을 경우 3,000원)</span>	
+		              </p>
+		            </div>		            
+		            <div class="c_refundG_03">
+		              <strong class="c_refundG_03title">03. 교환/반품이 불가한 경우</strong>
+		              <p class="c_refundG_03text">
+		              	다음에 해당하는 교환/환불 신청은 처리가 어려울 수 있으니 양해 부탁드립니다.
+		              	<span>
+		              	- 고객님의 책임 있는 사유로 상품이 멸시되거나 훼손된 경우
+		              	- 고객님의 사용 또는 일부 소비로 상품의 가치가 감소한 경우
+		              	- 시간이 지나 다시 판매하기 곤란할 정도로 상품의 가치가 감소한 경우
+		              	- 복제가 가능한 상품의 포장이 훼손된 경우
+		              	- 고객님의 주문에 따라 개별적으로 생산되는 상품의 제작이 이미 진행된 경우
+		              	</span>
+		              </p>
+		            </div>
+	            </div> 
+	            <div class="c_cancelGuide">
+	              <strong class="c_cancelG_title">주문 및 예약 취소 안내</strong>
+	              <p class="c_cancelG_text">상품 주문 및 클래스 예약을 취소하실 수 있습니다.</p>
+	              <button type="button" class="cancelGuideBtn">자세히 보기 ▼</button>
+	            </div>
+	            <div id="cancelGuide">
+		            <div class="c_cancelG_01">
+		              <strong class="c_cancelG_01title">상품 주문 취소 관련</strong>
+		              <p class="c_cancelG_01text">
+		              - [배송준비중] 부터는 취소가 불가하니, 반품으로 진행해주세요.
+		              - 상품에 반품이 불가할 수 있습니다.
+		              - 일부 상품은 배송 3~4일 전에만 취소 가능합니다
+		              - 주문상품의 부분취소는 불가능합니다. 전체 주문 취소 후 다시 구매 해주세요.
+		              </p>
+		            </div>
+		            <div class="c_cancelG_02">
+		              <strong class="c_cancelG_02title">클래스 예약 취소 관련</strong>
+		              <p class="c_cancelG_02text">
+		              	<strong class="c_cancelG_02text_A">클래스 예약 취소</strong><br>
+		              	- 클래스 예약 취소는, 클래스 진행 1일 전까지 취소 가능합니다.
+		              	- 클래스 예약은 당일 취소가 불가합니다.
+		              	
+		              	<strong class="c_cancelG_02text_B">클래스 예약 환불</strong><br>
+					 	- 클래스 진행 후 환불은 불가합니다.
+					  	- 클래스 진행 1일 전 취소시 환불 가능하니, 고객센터에 문의해주세요.
+		              </p>
+		            </div>
+		          </div>	
+	          </div> 
+	        </div>
+	      </section>  
+	  	</main>
+	    </div>	
+	  </div>
+	</div>
+	</body>
+</html>

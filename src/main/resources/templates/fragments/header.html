@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<body>
+		<header th:fragment="header" class="header">
+			<input type="hidden" id="orderMsg" name="orderMsg" th:value="${orderMsg}">
+			<input type="hidden" sec:authorize="isAuthenticated()" name="authenticate" value=true>
+			<input type="hidden" sec:authorize="isAnonymous()" name="authenticate" value=false>
+		    <div id="login-btn">
+			    <div sec:authorize="!hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" th:remove="tag">
+			    	<button type="button" id="btn-login" class="login header-font">로그인</button>
+			    </div>
+			    <div sec:authorize="hasRole('ROLE_USER')" th:remove="tag">
+			    	<a th:href="@{/cart/cartList}"><img th:src="@{/images/cart.png}" style="width: 45px; margin-top: 10px"></a>
+			    	<a th:href="@{/mypage/myPage}" sec:authentication="principal.username" class="mypage header-font"></a>
+			    	<a th:href="@{/main/logout}" id="btn-login" class="login header-font">로그아웃</a>
+			    </div>
+			    <div sec:authorize="hasRole('ROLE_ADMIN')" th:remove="tag">
+			    	<a th:href="@{/admin/adminMain}" sec:authentication="principal.username" class="mypage header-font"></a>
+			    	<a th:href="@{/main/logout}" id="btn-login" class="login header-font">로그아웃</a>
+			    </div>
+		    </div>
+		    <div><a th:href="@{/}" class="logo"><img th:src="@{/images/logo.png}"></a></div>
+		    
+		    
+		    <div id="menu-btn" class="nav-h header-font">
+		      <div class="navbar">
+		        <a name="checkLogin" th:href="@{/dayclass/onedayClass}">원데이클래스</a>
+		        <a name="checkLogin" th:href="@{/item/list}">제품구매</a>
+		        <a th:href="@{/board/noticeList/3}">공지사항</a>
+		        <a th:href="@{/board/qnaList/1}">Q&A</a>
+		        <a th:href="@{/board/eventList/4}">이벤트</a>
+		      </div>
+		    </div>
+		    </div>
+		    
+		    <div class="login-form-container">
+		      <span id="close-login-form" class="fas fa-times"></span>
+		  
+		      <form id="loginForm" action="/user/loginProc" method="post">
+		      	  <input type="hidden" id="errorMsg" th:value="${param.errorMsg}">
+		          <h3>login</h3>
+		          <div class="input-group">
+		            <input type="text" id="id" name="userId" required class="input">
+		            <label for="id" class="input-label">아이디</label>
+		          </div>
+		          <div class="pw-check">
+		            <div class="input-group inputBox">
+		              <input type="password" id="pw3" name="userPw" required class="input">
+		              <label for="pw3" class="input-label">비밀번호</label>
+		              <div class="show"></div>
+		            </div>
+		          </div>
+		          <div class="button">
+		            <a th:href="@{/user/findID}" class="finfId">아이디찾기</a>
+		            <P>|</P>
+		            <a th:href="@{/user/findPW}" class="findPw">비밀번호찾기</a>
+		          </div>
+		          <div>
+			          <button type="submit" id="btnLogin" class="btn btn-none">로그인</button>
+			          <a th:href="@{/user/join}" class="btn">회원가입</a>
+			          <a th:href="@{/oauth2/authorization/kakao}" class="kakao"><img th:src="@{/images/kakao_login.png}"></a> 
+		          </div>
+		      </form>
+		    </div>  
+		  </header>
+	</body>
+</html>

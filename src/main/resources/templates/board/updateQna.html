@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout}">
+<head> <!-- 회원 Q&A 작성 페이지 -->
+	<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/board/insertBoard.css}"/>
+	</th:block>
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+			$(function() {
+				$('#cateCodeSelect').val('2').prop("selected", true);
+			});
+		</script>			
+	</th:block>
+</head>
+<body>
+<div layout:fragment="content">
+	<div id="container" style="margin-bottom: 100px;">
+	  <div id="high-container">
+	    <div id="mid-container">
+		    <form id="insertQna" th:action="@{/board/qna/{cateCode}/{boardNo} (cateCode=${cateCode}, boardNo=${getBoard.boardNo})}" method="post" enctype="multipart/form-data">
+		      <input type="hidden" id="selectCateCode" th:value="${getBoard.cateCode}">
+		      <select name="cateCode" id="cateCodeSelect">
+	            <option value="1">원데이클래스</option>
+	            <option value="2">상품판매</option>
+	          </select>		      
+		      <div id="title-container">
+		        <h3>제목</h3>
+		        <input type="text" id="inputtitle" name="boardTitle" th:value="${getBoard.boardTitle}"/>
+		      </div>
+		      <div id="content-container">
+		        <textarea name="boardContent" id="boardContent" cols="30" rows="10" th:text="${getBoard.boardContent}"></textarea>
+		      </div>
+		      <p id="caution_text">※ 관리자의 답변이 등록된 경우, 질문 글의 수정과 삭제가 불가합니다.</p>
+		      <div id="btn-container">
+		        <div id="left-btn">
+		          <input type="button" id="listbtn" value="목록" onclick="history.go(-2)">
+		        </div>
+		        <div id="right-btn">
+		          <input type="submit" id="insertbtn" value="등록">
+		        </div>
+		      </div>  
+		    </form>    
+	    </div>
+	  </div>
+	</div>
+</div>
+</body>
+</html>

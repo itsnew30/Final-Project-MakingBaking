@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout}">
+<head> <!-- 관리자 이벤트 글 작성 페이지 -->
+	<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/board/insertBoard.css}"/>
+	</th:block>
+</head>
+<body>
+<div layout:fragment="content" style="height: 70%; margin: 100px auto 0;">
+	<div id="container">
+	  <div id="high-container">
+	    <div id="mid-container">
+		    <form id="insertEvent" th:action="@{/board/event/{cateCode} (cateCode=${cateCode})}" method="post" enctype="multipart/form-data">
+		      <div id="title-container">
+		        <h3>제목</h3>
+		        <input type="text" id="inputtitle" name="boardTitle"/>
+		      </div>
+		      <div id="content-container">
+		        <textarea name="boardContent" id="boardContent" cols="30" rows="10"></textarea>
+		      </div>
+		      <div id="btn-container">
+		        <div id="left-btn">
+		          <input type="button" id="listbtn" value="목록">
+		        </div>
+		        <div id="right-btn">
+		          <input type="submit" id="insertbtn" value="등록">
+		        </div>
+		      </div>
+		    </form>     
+	    </div>
+	  </div>
+	</div>
+</div>
+</body>
+</html>

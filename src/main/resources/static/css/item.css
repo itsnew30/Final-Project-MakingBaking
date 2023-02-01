@@ -1,0 +1,586 @@
+			@font-face {
+			    font-family: 'GowunBatang-Regular';
+			    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/GowunBatang-Regular.woff') format('woff');
+			    font-weight: normal; 
+			    font-style: normal;
+			}
+			.it_cDetatils_text {
+				font-family: 'GowunBatang-Regular';
+			}
+			.it_cintro_title {
+				font-family: 'GowunBatang-Regular';
+				color: #666666 ;
+				text-align: center;
+				font-style:italic;
+				font-size: 28px;	
+			}
+			.entire-wrap {
+		      width: 100%;
+		      height: 100%;
+		      position: relative;
+		    }
+		    .item {
+		      position: relative;
+		      width: 950px;		      
+		      margin: 100px auto 180px;
+		      padding-top: 30px;
+		    }	
+		    .item_hr{
+		      margin: 50px 0 50px 0;
+		      height: 2px; 
+		      background-color: rgb(235, 235, 235);		      
+		    }
+			
+
+		    /* 배너 dc_banner */
+		    .it_banner_container {
+		      width: 100%;
+		      background-color: white;
+		    }
+		    .it_banner {
+				display: flex;
+				justify-content: space-around;
+			}
+
+			.itbanner_mainImg {
+				margin-top: 30px;
+			}
+			.itbanner_main_img {
+		      	margin-right: 50px;
+		    }
+			.itbanner_explain{
+				margin-top: 25px;
+		      margin-right: 20px;
+			}
+		    
+		    .item_h2{
+				color:rgb(74, 74, 74);	
+			}
+			.itbanner_explain_sTitle{
+				margin-top: 15px;			 
+			    color:rgb(102, 102, 102);	
+			}
+		    
+		    .itbanner_explain_KRW{
+				font-size: 20px;
+				font-weight: 600;
+				margin: 40px 0 30px 0;
+			}
+			
+			/*배너 상세정보*/
+			.it_explainList_div {
+				margin: 20px auto;
+			}
+			.it_explainList_T{				
+				font-size: 14px;
+				width:400px;
+				border: 1px solid rgb(221, 221, 221);	
+				border-collapse: collapse;
+				border-left: hidden;
+				border-right: hidden;	
+			}
+			.it_explainList{
+				width:10%;
+				text-align: left;
+				color: rgb(102, 102, 102);	
+			}
+			.it_explainList_T tr {
+				height: 75px;				
+			}
+			.it_explainList_T td {
+				width:20%;				
+				color: rgb(102, 102, 102);	
+			}
+			
+			/*배너 버튼*/
+		    .itbanner_explain_btn {
+		      	margin-top: 30px;
+		    }
+		    #itemCartBtn {
+		      width: 120px;
+		      height: 40px;
+		      border: 1.2px solid #28693F;
+		      border-radius: 4px;
+		      background-color: white;
+		      text-align: center;
+		      display: inline-block;
+		      color: #28693F;
+		      font-size: 16px;
+		      font-weight: 550;
+		      margin-right: 10px;
+		      letter-spacing:1px	
+		    }
+		    #itemLikeBtn {
+			  width: 120px;
+		      height: 40px;		      
+		      border-radius: 4px;
+		      background-color: #28693F;
+		      text-align: center;
+		      display: inline-block;
+		      color: white;
+		      font-size: 16px;
+		      font-weight: 550;
+		      margin-right: 10px;
+		      letter-spacing:1px	
+			}
+		    #itemCartBtn:hover {
+		      background-color: #28693F;
+		      color: white;
+		      font-weight: 520;
+		    }
+		    #itemLikeBtn:hover {		  
+			  border: 1.2px solid #28693F;
+		      background-color: white;
+		      color: #28693F;
+		      font-weight: 520;
+		    }
+		    
+		    /* 내용 h2, p 글씨색상 공통 */
+		    .it_cDetatils_title, .it_rvw_title, .c_cancel_title {
+		      color: rgb(74, 74, 74);	      
+		      font-weight: 600;
+		    }
+
+				
+			.it_cintro textarea{
+			  width: 100%;
+    		  font-size: 17px;
+    		  border: none;
+    		  resize: none;	
+    		  margin: 40px 0 50px 0;
+    		  text-align: center;
+    		  line-height:40px; 
+    		  overflow-y: hidden;
+ 		  
+			}
+			
+		    /* 영양 정보*/
+			.it_cDetatils {
+				text-align: center;
+			  	margin: 70px 0 70px 0;
+			}
+			.it_cDetatils_main_img {
+				text-align: center;
+				width:500px;		
+			}
+			
+		    /* 메뉴바 dc_menu */
+		    .it_menu {
+		      margin-top: 60px;
+		    }
+		    .it_menu ul {
+		      display: flex;
+		    }
+		    .itmenu ul li {
+		      text-decoration: none;
+		      list-style:none;
+		      color: rgb(51, 51, 51);
+		      
+		      width: 25%;
+		      line-height: 50px;
+		      text-align: center;		      
+		      background-color: rgb(235, 235, 235);
+		    }
+		    .itmenu ul a {
+		      text-decoration: none;
+		      color: rgb(51, 51, 51);
+		    }		
+		    .itmenu a:hover {
+		      font-weight: 600;
+		      color: #28693F; 
+		    }		
+		   
+		    /* it_cotents */
+		    .it_contents_container {
+		      margin-top: 100px;
+		    }
+
+			/* 구매자 후기작성 */
+			.rvw_orderInfo {
+				margin: 20px 0 20px 0;
+				color:rgb(102, 102, 102);
+			}			
+			.rvw_orderNo {
+		 	  font-size: 15px;		 	  
+ 			} 
+			.rvw_orderNo input[name='reviewOrderNo']{
+		 	  display:none;		 	  
+ 			} 		
+			.rvw_orderNo label{
+    		  color: transparent;
+    		  text-shadow: 0 0 0 #dde0e3;
+			}
+			.rvw_orderNo label:hover{
+    		  text-shadow: 0 0 0 #28693F;;
+    		  font-weight: 600;
+    		  
+			}
+			/*
+			.rvw_orderNo label:hover ~ label{
+    		  text-shadow: 0 0 0 #28693F;
+    		  font-weight: 600;
+			}
+			*/
+			.rvw_orderNo input[name='reviewOrderNo']:checked ~ label{
+   			  text-shadow: 0 0 0 #28693F;
+   			  font-weight: 600;
+   			  font-size: 18px;
+			}	
+			
+		    /* 후기 작성  */		 
+		    .rvwWriteSection fieldset{
+			  display: inline-block;
+    		  direction: rtl;
+    		  border:0;
+    		  margin: 40px 0 15px 0;
+			}
+			.rvwWriteSection input[name='rvwScore']{
+		 	  display: none;
+ 			} 			
+			.rvwWriteSection label{
+    		  font-size: 30px;
+    		  color: transparent;
+    		  text-shadow: 0 0 0 #f0f0f0;
+			}
+			.rvwWriteSection label:hover{
+    		  text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+			}
+			.rvwWriteSection label:hover ~ label{
+    		  text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+			}
+			.rvwWriteSection input[name='rvwScore']:checked ~ label{
+   			  text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+			}		
+			.rvwWriteSection textarea {	  
+			  width: 100%;
+    		  height: 6.3em;
+    		  border: 1px solid rgb(102, 102, 102);
+    		  resize: none;		 
+			}		
+			.star-wrapper {
+				display:flex;
+				justify-content: space-between;
+			}		
+			.textLength {
+			  display:flex;
+			  float: right;
+			  margin-top:70px;
+			  font-size: 14px;
+			  color: rgb(102, 102, 102);
+			}
+			textarea::placeholder {
+  			  font-size: 1.1em;  			 
+			}	
+			.writeBtn_div{
+				text-align: right;
+			}
+			.it_rvw_writeBtn {
+			  margin-top:10px;		
+			  width: 95px;
+ 			  height: 30px;
+  			  border-radius: 4px;
+			  text-decoration: none;
+		      background-color: #28693F;
+		      border: 1px solid #28693F;
+		      color: white;      
+		      display: inline-block;
+		      text-align: center;    
+		      font-size: 14px;
+		      line-height: 1;
+		      letter-spacing:3px;		      
+			}		
+			.it_rvw_writeBtn:hover {
+		      background: white;
+		      border: 1px solid #28693F;
+		      font-weight: 600;
+		      color: #28693F;
+		    }
+			
+			/* 후기 목록 */
+		    .it_rvw_wirte_detail {
+		   	  margin:50px 0 50px 0;
+		    }
+		    .it_rvw_option {
+		      margin-bottom:15px;
+		      float:right;
+		    }
+		    #it_rvw_array {
+			 border: 1px solid rgb(102, 102, 102);
+			 width: 100px;
+			 height: 28px;			 
+			}
+		    .it_rvw_list {
+		      width: 100%;
+		      border-collapse: collapse;
+		      border-spacing: 2px;
+		      text-align: center;
+		      height: 25px;
+		    }
+		    .it_rvw_list th{
+		      border:1px solid rgb(102, 102, 102);
+		      border-left: none;
+		      border-right: none;
+		      height: 30px;
+		      font-size: 14.5px;
+		      color: rgb(102, 102, 102);
+		    }
+		    .it_rvw_list td{
+		      border:1px solid rgb(102, 102, 102);
+		      border-left: none;
+		      border-right: none;
+		      height: 90px;
+		      font-size: 13.5px;
+		      color: rgb(102, 102, 102);
+		    }		 
+		    .it_rvw_paging{
+		      margin:50px 0 50px 0;
+		    }
+		    .paging_btn{
+				list-style: none;
+			}
+		    .paging a {
+		      text-decoration: none;
+		      width: 100%;
+		      text-align: center;
+		      height: 25px;
+		    }
+		    .paging_btn a {
+		      text-decoration: none;
+		      padding: 3px 10px 3px 10px ;
+		      color: rgb(102, 102, 102);
+		      font-size: 16px;      
+		    }
+		    .paging_btn a:hover {
+		      font-weight: 600;		   
+		      color: #28693F;
+		    }
+		
+		
+		    /* 환불 취소*/
+		    .c_cancel_text_A{ 
+		      margin-top: 50px;
+		      margin-bottom: -5px;
+		      font-weight: 600;
+		      font-size: 16px;
+		      color: rgb(102, 102, 102);
+		     
+		    }
+		    .c_cancel_text_B{ 
+			  margin-top: 13px;	
+		      font-size: 14px;
+		      color: rgb(102, 102, 102);
+		    }
+		
+		    /* 문의 */
+		    .c_Qna {
+		      height: 100px;
+		      margin-top: 100px;
+		      margin-bottom: 100px;
+		      margin-left: 0px;
+		    }
+		    .c_Qna ul li strong {
+		      color: #28693F;
+		    }
+		    .c_Qna ul li {
+		      list-style:none;
+		      float: left;
+		      width: 50%;
+		    }
+		    .c_Qna_text_A, .c_Qna_text_B {
+			  margin-top:5px;
+		      font-size: 15px;
+		      color: rgb(102, 102, 102);
+		      line-height: 28px;
+		    }
+		    .c_Qna_text_C {
+		      margin-top: 5px;
+		      font-size: 13px;
+		      color: rgb(102, 102, 102);
+		     
+		    }
+		
+		    /* 안내 **/
+		    #refundGuide {
+			  display:none;
+			}
+		    .c_refundGuide {
+		      display: flex;
+		      position: relative;
+		      padding: 14px 0px 17px;
+		      border-top: 1px solid rgb(221, 221, 221);
+		      border-right: 1px solid rgb(221, 221, 221);
+		      border-left: 1px solid rgb(221, 221, 221);
+		      border-image: initial;
+		      border-bottom: none;
+		      font-weight: 400;
+		      font-size: 14px;
+		      
+		    }
+		    #cancelGuide {
+			  display:none;
+			}
+		    .c_cancelGuide {
+		      display: flex;
+		      position: relative;
+		      padding: 14px 0px 17px;
+		      border: 1px solid rgb(221, 221, 221);
+		      font-weight: 400;
+		      font-size: 14px;
+		     
+		    }
+		    .c_refundG_title, .c_cancelG_title {
+		      width: 200px;
+		      padding: 14px 0px 17px;
+		      padding-left: 29px;
+		      font-weight: 600;
+		      font-size: 16px;
+		      color: #28693F;
+		    }
+		    .c_refundG_text, .c_cancelG_text {
+			  margin-top:15px;
+		      margin-left: 50px;
+		      font-size: 15px;
+		      color: rgb(102, 102, 102);
+		    }
+		    .refundGuideBtn, .cancelGuideBtn {
+		      position: absolute;
+		      right: 25px;
+		      top: 50%;
+		      margin-top: -14px;
+		      padding-right: 20px;
+		      border: none;
+		      font-weight: 600;
+		      font-size: 14px;
+		      color: #28693F;
+		      line-height: 24px;
+		      letter-spacing: -0.4px;
+		      background-color: transparent;
+		    }
+		    
+		    /* 안내 자세히 보기 - 교환 및 환불 */
+		    .c_refundG_01 {
+				display: flex;
+			    padding: 39px 0 40px;
+			    border-top: 1px solid #ddd;
+			}
+		    .c_refundG_01title {
+				width: 250px;
+			    padding-left: 31px;
+			    font-weight: 600;
+			    font-size: 14px;
+			    color: rgb(102, 102, 102);
+			    line-height: 25px;
+			}
+			.c_refundG_01text_A {
+			 	padding: 2px 20px 0 0;
+			    font-weight: 300;
+			    font-size: 14px;
+			    line-height: 22px;
+			    white-space: pre-line;
+			}
+			.c_refundG_01text_B {
+				margin-top:10px;
+			}
+			
+			.c_refundG_02 {
+				display: flex;
+			    padding: 39px 0 40px;
+			    border-top: 1px solid #ddd;
+			}
+		    .c_refundG_02title {
+				width: 340px;
+			    padding-left: 31px;
+			    font-weight: 600;
+			    font-size: 14px;
+			    color: rgb(102, 102, 102);
+			    line-height: 25px;
+			}
+			.c_refundG_02text {				
+			 	padding: 2px 20px 0 0;
+			    font-weight: 300;
+			    font-size: 14px;
+			    line-height: 22px;
+			    white-space: pre-line;
+			    margin-top: -22px
+			}
+			.c_refundG_02text_A  {
+				
+				font-weight: 600;
+				color: #28693F;					
+			}
+			.c_refundG_02text_B {
+				margin-top:10px;
+				font-weight: 600;
+				color: #28693F;					
+			}				
+			.c_refundG_03 {
+				display: flex;
+			    padding: 39px 0 40px;
+			    border-top: 1px solid #ddd;
+			}
+		    .c_refundG_03title {
+				width: 250px;
+			    padding-left: 31px;
+			    font-weight: 600;
+			    font-size: 14px;
+			    color: rgb(102, 102, 102);
+			    line-height: 25px;
+			}
+			.c_refundG_03text {
+			 	padding: 2px 20px 0 0;
+			    font-weight: 300;
+			    font-size: 14px;
+			    line-height: 22px;
+			    white-space: pre-line;
+			    margin-top: -22px;
+			}
+			
+			
+			/* 안내 자세히 보기 - 주문 및 예약 취소 안내 */
+			.c_cancelG_01 {
+				display: flex;
+			    padding: 39px 0 40px;
+			    border-top: 1px solid #ddd;
+			}
+		    .c_cancelG_01title {
+				width: 250px;
+			    padding-left: 31px;
+			    font-weight: 600;
+			    font-size: 14px;
+			    color: rgb(102, 102, 102);
+			    line-height: 25px;
+			}
+			.c_cancelG_01text {
+			 	padding: 2px 20px 0 0;
+			    font-weight: 300;
+			    font-size: 14px;
+			    line-height: 22px;
+			    white-space: pre-line;
+			    margin-top: -23px
+			}
+			.c_cancelG_02 {
+				display: flex;
+			    padding: 39px 0 40px;
+			    border-top: 1px solid #ddd;
+			    border-bottom: 1px solid #ddd;
+			}
+		    .c_cancelG_02title {
+				width: 250px;
+			    padding-left: 31px;
+			    font-weight: 600;
+			    font-size: 14px;
+			    color: rgb(102, 102, 102);
+			    line-height: 25px;
+			}
+			.c_cancelG_02text {					
+			 	padding: 2px 20px 0 0;
+			    font-weight: 300;
+			    font-size: 14px;
+			    line-height: 22px;
+			    white-space: pre-line;
+			    margin-top: -22px;
+			    
+			}
+			.c_cancelG_02text_A,  .c_cancelG_02text_B{
+				color: #28693F;	
+			}

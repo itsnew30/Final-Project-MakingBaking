@@ -1,0 +1,68 @@
+.container {
+  display: flex;
+  height: 75%;
+  justify-content: center;
+  align-items: center;
+}
+.form{
+  margin:2rem;
+  text-align: center;
+  padding:2rem;
+  width:30rem;
+  border-radius: .5rem;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+  border:1px solid black;
+  background: #fff;
+}
+
+.buttons{
+  display: flex;
+  gap:1rem;
+  align-items: center;
+}
+.size {
+  font-size: 1rem;
+  background:#28693F;
+  color:white;
+  border: 1px solid #28693F;
+}
+.btn2{
+  padding: 0.8rem;
+  display: block;
+  width:100%;
+  margin:.5rem 0;
+  cursor: pointer;
+  border-radius: 0.5rem
+}
+.login2 {
+  font-size: 16px;
+  background: white;
+  color: #28693F;
+  border: 1px solid #28693F;
+}
+.box{
+  margin:.7rem 0;
+  width: 100%;
+  font-size: 1rem;
+  color:black;
+  text-transform: none;
+  border:1px solid black;
+  padding:1rem 1.2rem;
+  border-radius: .5rem;
+}
+
+.findPw2 {
+	display: flex;
+    font-size: 12px;
+    margin: 0 0 2rem 21rem;
+}
+
+a{
+  color:black;
+}
+
+h3{
+  padding-bottom:1rem;
+  font-size: 2.5rem;
+  color:black;
+}

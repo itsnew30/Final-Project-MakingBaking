@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	  
+	<!-- head 영역 시작 -->
+	<!-- 개별적으로 사용할 css, js 링크를 걸기 위해서 남겨둠 -->
+	<head>
+		<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/item.css}">
+			<style>
+				hr {
+					height: 1px;
+					background: black;
+				}
+				#complete_title {
+				    font-size: 40px;
+				}
+				#process {
+				    float: right;
+				    font-size: 20px;
+				    margin-bottom: 20px;
+				}
+				#process span {
+				    margin: 2px 5px;
+				}
+				.process3 {
+				    font-weight: bold;
+				}
+				#process+hr {
+				    clear: both;
+				}
+				#completeMent {
+				    margin: 40px auto;
+				}
+				#completeMent .orderNumber {
+				    text-align: center;
+				    margin: 5px;
+				}
+				#completeMent .orderCompleteMent {
+				    text-align: center;
+				    margin: 15px;
+				    font-size: 25px;
+				}
+				#completeMent #bankPayment {
+				    text-align: center;
+				    margin: 10px;
+				}
+				.deposit {
+					margin-top: 5px;
+				}
+				#completeMent #kakaoPay {
+				    text-align: center;
+				    margin: 5px;
+				}
+				#completeMent #btns {
+				    margin-top: 30px;
+				    text-align: center;
+				}
+				#btnMypage, #btnMain {
+				    width: 100px;
+				    height: 40px;
+				    font-size: 15px;
+				    cursor: pointer;
+					border: 1.5px solid #28693F;
+ 					border-radius: 4px;
+ 					background-color: white;
+ 					color: #28693F;
+ 					letter-spacing:1px
+				}
+				#btnMypage {
+					color: white;
+					background: #28693F;
+				}
+				#btnMain:hover {
+					color: white;
+					background: #28693F;
+				}
+			</style>
+		</th:block>
+		<th:block layout:fragment="script">
+			<script th:inline="javascript">
+				$(function() {
+					const orderNo = /*[[${orderNo}]]*/;
+					console.log(typeof String(orderNo)); // number
+					console.log(String(orderNo).substring(0,8)); // 20230102000029
+					let orderDateYMD = String(orderNo).substring(0,8); // 20230102
+					let orderDateYear = orderDateYMD.substr(0,4); // 2023
+					let orderDateMonth = orderDateYMD.substr(4,2); // 01
+					let orderDateDate = orderDateYMD.substr(6,2); // 02
+					let orderDate = orderDateYear + "/" + orderDateMonth + "/" + orderDateDate; // 2023-01-02
+					console.log(new Date(orderDate)); // Mon Jan 02 2023 09:00:00 GMT+0900 (한국 표준시)
+					let orderD = new Date(orderDate);
+					orderD.setDate(orderD.getDate()+1);
+					let deadline = orderD.toLocaleDateString('ko-KR', {
+					    year: 'numeric',
+					    month: 'long',
+					    day: 'numeric',
+					});
+					console.log(deadline);
+					$(".deadline").text(deadline);
+					
+				});
+			</script>
+		</th:block>
+	</head>
+	<!-- head 영역 끝 -->
+	
+	<body>
+		<div layout:fragment="content" style="min-height: 56.8%;">
+			<div id="container">
+	            <h1 id="complete_title">주문완료</h1>
+	            <div id="process">
+	                <span class="process1">장바구니</span><span class="processPointer1">&gt;</span><span class="process2">주문결제</span><span class="processPointer2">&gt;</span><span class="process3">주문완료</span>
+	            </div>
+	            <hr>
+	            <div id="completeMent">
+	                <div class="orderNumber">주문번호: <span th:text="${orderNo}"></span></div>
+	                <p class="orderCompleteMent">주문 완료되었습니다!</p>
+	                <div id="bankPayment" th:if="${orderPayment == '무통장입금'}">
+	                    <span>입금계좌: 이젠은행 0507-1305-6509 예금주: 메이킹베이킹</span>
+	                    <p class="deposit"><span>입금액: </span><span class="totalPrice" th:text="${#numbers.formatInteger(totalPayPrice, 3, 'COMMA')}"></span><span>원</span>&ensp;
+	                    <span>입금기한: </span><span class="deadline"></span><span> 오후 11시 59분 59초</span></p>
+	                </div>
+	                <div id="kakaoPay" th:unless="${orderPayment == '무통장입금'}">
+	                    <span>카카오페이 결제</span><span> &#124; 결제금액: </span><span class="totalPrice" th:text="${#numbers.formatInteger(totalPayPrice, 3, 'COMMA')}"></span><span>원</span>
+	                </div>
+	                <div id="btns">
+	                    <input type="button" id="btnMypage" value="마이페이지" onclick="location.href='/mypage/myPage'">
+	                    <input type="button" id="btnMain" value="메인으로" onclick="location.href='/home/main'">
+	                </div>
+	            </div>
+	            <hr>            
+	        </div>
+		</div>
+	</body>
+</html>

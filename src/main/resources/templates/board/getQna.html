@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout}">
+<head> <!-- Q&A 상세 페이지 -->
+	<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/board/getBoard.css}"/>
+	</th:block>
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+			$(function() {
+				$("#deletebtn").on('click', function(e){
+					e.preventDefault(); // a태그 이벤트 중지
+					
+					$.ajax({
+						url:'/board/qna',
+						type: 'delete',
+						data: {
+							boardNo: $("#boardNo").val()
+						},
+						success: function(){
+							alert("삭제되었습니다.");
+							window.location.href="/board/qnaList/1";
+						},
+						error: function(e){
+							console.log(e);
+						}
+					});
+				});
+				
+			
+			});
+		</script>			
+	</th:block>
+</head>
+<body>
+<div layout:fragment="content">
+	<div id="container" style="height: 100%; margin: 100px auto 200px;">
+	  <div id="high-container">
+	    <div id="mid-container">
+	      <div id="question-title">
+	        <h3 th:text="${getBoard.boardTitle}"></h3>
+	      </div>
+	      <div id="question-userinfo">
+		      <div id="question-writer">
+		      	<p th:text="'작성자 : ' + ${getBoard.boardWriter}"></p>
+		      </div>
+		      <div id="question-regdate">
+		      	<p th:text="${'작성일 : ' + #strings.substring(getBoard.boardRegdate, 0, 10) + '&nbsp;' + #strings.substring(getBoard.boardRegdate, 11, 19)}"></p>
+		      </div>
+	      </div>
+	      <div id="question-content">
+	      	<textarea th:text="${getBoard.boardContent}" cols="30" rows="5" readonly></textarea>
+	      </div>
+	      <hr>
+	      <th:block th:if="${getBoard.boardReply}">
+		      <div id="answer-content">       
+		      	<textarea id="answer-text" th:text="${getBoard.boardReply}" cols="30" rows="10"></textarea> 
+		      </div>
+	      </th:block>
+	      <th:block th:unless="${getBoard.boardReply}">
+	     	 <div id="answer-content">        
+		        <p id="answer-text">
+		        	아직 관리자의 답변이 작성되지 않았습니다.&nbsp;&nbsp;빠른 시일내에 답변해드리도록 노력하겠습니다.
+		        </p>
+		      </div>
+	      </th:block>
+	      <div id="btn-container">
+	        <div id="left-btn">
+	          <a th:href='@{/board/qnaList/{cateCode} (cateCode=${getBoard.cateCode})}' id="listbtn">목록</a>
+	        </div>
+	        <div th:if="${getBoard.boardWriter == userId && getBoard.boardReply == null}">
+		        <th:block sec:authorize="hasRole('ROLE_USER')" th:remove="tag">
+		        	<form id="deleteForm" enctype="multipart/form-data">
+		        		<input type="hidden" name="boardNo" id="boardNo" th:value="${getBoard.boardNo}">
+		        		<input type="hidden" name="cateCode" id="cateCode" th:value="${getBoard.cateCode}">
+			        	<div id="right-btn">
+						  <a href="#" id="deletebtn">삭제</a>   
+						</div>
+						<div id="right-btn">
+						  <a th:href='@{/board/qna/updateQna/{cateCode}/{boardNo} (cateCode=${getBoard.cateCode}, boardNo=${getBoard.boardNo})}' id="updatebtn">수정</a>   
+						</div>
+		        	</form>
+				</th:block>
+	        </div>
+	        <th:block sec:authorize="hasRole('ROLE_ADMIN')" th:remove="tag">
+		        <div id="right-btn">
+				  <a th:href='@{/board/qna/insertAnswer/{cateCode}/{boardNo} (cateCode=${getBoard.cateCode}, boardNo=${getBoard.boardNo})}' id="insertbtn">답변등록</a>   
+				</div>
+			</th:block>
+	      </div>      
+	    </div>
+	  </div>
+	</div>
+</div>
+</body>
+</html>

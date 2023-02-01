@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	  
+	<!-- head 영역 시작 -->
+	<!-- 개별적으로 사용할 css, js 링크를 걸기 위해서 남겨둠 -->
+	<head>
+		<th:block layout:fragment="css">
+			<style>
+				#a_Title {
+					text-decoration: none;
+					color: inherit;
+				}
+				.a_reviewName {
+					text-decoration: none;
+					color: inherit;
+				}
+				#td_reviewName:hover {
+					text-decoration: underline;
+					color: #28693F;
+					font-weight: bold;
+				}
+				.reviewAdmin {
+					font-size: 40px;
+				}
+				/* 검색 div */
+				#review_search {
+					display: flex;
+					margin: 80px auto;
+				}
+				#searchCondition {
+					height: 35px;
+					border: 1px solid #28693F;
+				}
+				/* 검색창 */
+				#inputSearch {
+					width: 250px;
+					height: 35px;
+					border: 1px solid #28693F;
+					margin: auto 10px;
+					display: inline-block;
+				}
+				#selectSearch {
+					height: 35px;
+					border: 1px solid #28693F;
+					margin: auto 10px;
+				}
+				/* 검색 버튼 */
+				#btnSearch {
+					width: 80px;
+					height: 35px;
+					border: 1.2px solid #28693F;
+					background-color: white;
+					text-align: center;
+					color: #28693F;
+					font-size: 16px;
+					font-weight: 550;
+					letter-spacing:1px;
+					display: inline-block;
+					cursor: pointer;
+				}
+				
+				/* 전체선택 Select */
+				#div_review_totalSelect {
+					margin: 15px auto;
+					text-align: right;
+				}
+				
+				/* 테이블 */
+				#reviewList_T {
+					width: 1200px;
+					border: 1.2px solid #28693F;
+					border-collapse: collapse;
+					border-left: hidden;
+					border-right: hidden;
+					border-top:hidden;
+				}
+				
+				#reviewList_T th {
+					background: #28693F;
+					color: white;
+					height: 35px;
+				}
+				
+				.reviewList_T_05 {
+					 width: 5%
+				}
+				.reviewList_T_10 {
+					 width: 10%
+				}
+				.reviewList_T_15 {
+					 width: 15%
+				}
+				.reviewList_T_50 {
+					 width: 50%
+				}
+				
+				#reviewList_T td {
+					border-bottom: 1.2px solid #28693F;
+					text-align: center;
+					height: 80px;
+				}
+				
+				/* 상품이름 a태그 */
+				#a_reviewName {
+					text-decoration: none;
+					color: inherit;
+				}
+
+			    /* 리뷰삭제 버튼 div */
+			    #reviewTotalBtn {
+					 text-align:right;
+					 margin: 50px auto;
+				}
+			    /* 상품삭제버튼 */
+			    #reviewDelete {
+					width: 150px;
+			      	height: 50px;
+			     	border: 1.2px solid #28693F;
+					border-radius: 4px;
+					background-color: white;
+					text-align: center;
+					display: inline-block;
+					color: #28693F;
+					font-size: 18px;
+					font-weight: 550;
+					letter-spacing:1px;
+			    }
+			    #reviewDelete:hover {
+					background-color: #28693F;
+					color: white;
+					font-weight: 550;
+					cursor: pointer;
+				}
+				
+				
+			    /* 페이징처리 */
+			    .paging {
+					text-align: center;
+					margin-top: 50px;
+				}
+			    .pagination {
+			      display: flex;
+			      justify-content: center;
+			      align-items: center;
+			      margin-bottom: 20px;
+			    }    
+			    .paging a{
+				  display: block;
+				  margin: 0 3px;
+				  border: 1px solid #ccc;
+				  width: 40px;
+				  height: 40px;
+				  line-height: 35px;
+				  text-align: center;
+			      color: #8c8c8c;
+			      font-size: 25px;
+			      font-weight: 600;
+			    }
+			    .paging a:hover {
+			      color: #28693F;
+			    }
+			    .paging a:focus {
+					background:#28693F;
+					color: white;
+				}
+				.paging .pagination .pagination_button a.present {
+					border-color: #28693F;
+					background: #28693F;
+					color: white;
+				}
+			</style>
+		</th:block>
+		<th:block layout:fragment="script">
+			<script th:inline="javascript">
+				let changeRows = [];
+				let pageNum;
+				
+				$(function() {
+					//검색창(작성자, 리뷰타입)
+					$("#searchCondition").on("change", function() {
+						if($(this).val() == 'RVWTYPE') {
+							$("#inputSearch").hide();
+							$("#selectSearch").show();
+							$("#inputSearch").attr("disabled", true);
+							$("#selectSearch").attr("disabled", false);
+						} else if($(this).val() != 'RVWTYPE') {
+							$("#inputSearch").show();
+							$("#selectSearch").hide();
+							$("#inputSearch").attr("disabled", false);
+							$("#selectSearch").attr("disabled", true);
+						}
+					});
+					
+					//검색창 검색버튼 클릭 시
+					$("#btnSearch").on('click',function() {
+						$("input[name='page']").val(0);
+						$("#searchForm").submit();
+					});
+					
+					// 전체선택 버튼 클릭했을 때
+					$("#reviewSelectAll").click(function() {
+						var chk = $("#reviewSelectAll").prop("checked");
+						if(chk) {
+							$("input[name='chk']").prop("checked", true);
+						} else {
+							$("input[name='chk']").prop("checked", false);
+						}
+					});
+					
+					// 리뷰 리스트 중 전체선택을 누른 뒤 리뷰 체크박스를 풀면, 전체선택 체크박스도 풀림
+					$(".check").click(function() {
+						if($("input[name='chk']:checked").length < $("input[name='chk']").length) {
+							$("#reviewSelectAll").prop("checked", false);
+						} else if($("input[name='chk']:checked").length == $("input[name='chk']").length) {
+							$("#reviewSelectAll").prop("checked", true);
+						}
+					});
+				});
+				
+				
+				//선택리뷰 삭제
+				$(function() {
+					//삭제버튼 클릭 시 체크된 게시물들 삭제 상태로 변경
+					$("#reviewDelete").on('click', function() {
+						$("input:checkbox[name='chk']").each(function() {
+							if($(this).is(":checked")) {
+								const delReview = {
+										rvwNo: $(this).val()
+									};
+									
+									changeRows.push(delReview);
+							}
+						});
+						
+						console.log(changeRows);
+						
+						if(confirm("선택한 리뷰를 삭제하시겠습니까?")) {
+						$.ajax({
+							url: '/admin/saveReviewList',
+							type: 'post',
+							data: {
+								changeRows: JSON.stringify(changeRows),
+								page: pageNum
+							},
+							success: function(obj) {
+								console.log(obj);
+								let htmlStr = "";
+								
+								htmlStr += `
+							
+								<tr>
+					        		<th class="reviewList_T_05"></th>
+							        <th class="reviewList_T_10">No.</th>
+							        <th class="reviewList_T_05">타입</th>
+							        <th class="reviewList_T_15">작성자</th>
+							        <th class="reviewList_T_50">내용</th>
+							        <th class="reviewList_T_10">등록일</th>
+							        <th class="reviewList_T_05">별점</th>
+					      		</tr>
+									      	`;
+								for(let i = 0; i < obj.pageItems.content.length; i++) {
+									htmlStr += `
+										<tr>
+											<td>
+												<input type="checkbox" name="chk" id="chk${obj.pageItems.content[i].rvwNo}"
+													value="${obj.pageItems.content[i].rvwNo}">
+											</td>
+											<td>${obj.pageItems.content[i].rvwNo}</td>
+											<td>${obj.pageItems.content[i].rvwType}</td>
+											<td>${obj.pageItems.content[i].rvwWriter}</td>
+											<td>${obj.pageItems.content[i].rvwContent}</td>
+											<td>${obj.pageItems.content[i].rvwRegdate == null ? '' : obj.pageItems.content[i].rvwRegdate.substr(0, 10)}</td>
+											<td>${obj.pageItems.content[i].rvwScore}</td>
+										</tr>
+									`;
+								}
+								
+								$("#reviewList_T").html(htmlStr);
+							},
+							error: function(e) {
+								console.log(e);
+							},
+						});
+						alert("삭제를 완료하였습니다.");
+						} else {
+							alert("삭제를 취소하였습니다.");
+						}
+						console.log(changeRows);
+					});
+
+				//리뷰리스트 페이징 처리
+				$(document).on("click", ".pagination a", function(e) {
+					e.preventDefault();
+					pageNum = $(this).attr("href");
+					reviewListPaging(pageNum, $("#searchCondition").val());
+				});
+				
+
+				}); //function 닫음
+				
+				
+				function reviewListPaging(page, condition) {
+					console.log(page);
+					console.log(condition);
+
+						$.ajax({
+						url: '/admin/reviewList',
+						type: 'post',
+						data: {
+							page: page,
+							searchCondition: condition
+						},
+						success: function(obj) {
+							console.log(obj);
+							
+							let htmlStr = "";
+							
+							htmlStr += `
+							
+								<tr>
+					        		<th class="reviewList_T_05"></th>
+							        <th class="reviewList_T_10">No.</th>
+							        <th class="reviewList_T_05">타입</th>
+							        <th class="reviewList_T_15">작성자</th>
+							        <th class="reviewList_T_50">내용</th>
+							        <th class="reviewList_T_10">등록일</th>
+							        <th class="reviewList_T_05">별점</th>
+					      		</tr>
+					      	`;
+							
+							for(let i=0; i<obj.pageItems.content.length; i++) {
+								htmlStr += `
+									
+									<tr>
+										<td>
+											<input type="checkbox" name="chk" id="chk${obj.pageItems.content[i].rvwNo}"
+												value="${obj.pageItems.content[i].rvwNo}">
+										</td>
+										<td>${obj.pageItems.content[i].rvwNo}</td>
+										<td>${obj.pageItems.content[i].rvwType}</td>
+										<td>${obj.pageItems.content[i].rvwWriter}</td>
+										<td>${obj.pageItems.content[i].rvwContent}</td>
+										<td>${obj.pageItems.content[i].rvwRegdate == null ? '' : obj.pageItems.content[i].rvwRegdate.substr(0, 10)}</td>
+										<td>${obj.pageItems.content[i].rvwScore}</td>
+									</tr>
+								`;
+							}
+							
+							$("#reviewList_T").html(htmlStr);
+							
+							htmlstr = "";
+						
+							let pageNumber = obj.pageItems.pageable.pageNumber;
+							let pageSize = obj.pageItems.pageable.pageSize;
+							let totalPages = obj.pageItems.totalPages;
+							let startPage = Math.floor((pageNumber / pageSize) * pageSize + 1);
+							let tempEndPage = startPage + pageSize -1;
+							let endPage = tempEndPage > totalPages ? totalPages : tempEndPage;
+							console.log(pageNumber);
+							console.log(pageSize);
+							console.log(totalPages);
+							console.log(startPage);
+							console.log(tempEndPage);
+							console.log(endPage);
+							
+							if(pageNumber > 0) {
+								htmlstr += `
+									<li class="pagination_button">
+										<a style="border: 0px;" href="${pageNumber - 1}">&#60;</a>
+									</li>
+								`;
+							}
+							
+							let realStart = totalPages - startPage < pageSize ? 
+												totalPages < pageSize ? 1 : totalPages - pageSize + 1 
+											: startPage;
+							
+							for(let i = realStart; i <= endPage; i++) {
+								if(pageNumber == i-1) {
+									htmlstr += `<li class="pagination_button">
+											   	   <a class="present" href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								} else {
+									htmlstr += `<li class="pagination_button">
+											   	   <a href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								}
+							}
+							
+							if(pageNumber < totalPages - 1) {
+								htmlstr += `<li class="pagination_button">
+										       <a style="border: 0px;" href="${pageNumber + 1}">&#62;</a>
+									        </li>
+								`;
+							}
+							
+							$(".pagination").html(htmlstr);
+							
+						}, error: function(e) {
+							console.log(e);
+						}
+					});
+				} //function 닫음
+				
+				
+			</script>
+		</th:block>
+	</head>
+	<!-- head 영역 끝 -->
+	
+<body>
+	<div id="container" layout:fragment="content">
+		<div>
+			<a href="reviewList" id="a_Title"><h1 class="reviewAdmin">리뷰 관리</h1></a>
+		</div>
+		<form id="searchForm" action="/admin/reviewList" method="get">
+			<div id="review_search">
+				<select name="searchCondition" id="searchCondition">
+					<option value="ALL" th:selected="${searchCondition == 'ALL' || searchCondition == '' || searchCondition == null}">전체</option>
+					<option value="RVWWRITER" th:selected="${searchCondition} == 'RVWWRITER'">작성자</option>
+					<option value="RVWTYPE" th:selected="${searchCondition} == 'RVWTYPE'">리뷰타입</option>
+	            </select>
+	            <input type="text" name="searchKeyword" value="" id="inputSearch" th:style="${searchCondition != 'RVWTYPE'  ? 'display: inline-block;' : 'display: none;'}">
+	            <select name="searchKeyword" id="selectSearch" th:style="${searchCondition == 'RVWTYPE' ? 'display: inline-block;' : 'display: none;'}">
+	            	<option>선택하세요.</option>
+	            	<option value="item" th:selected="${searchKeyword} == 'item'">item</option>
+	              	<option value="class" th:selected="${searchKeyword} == 'class'">class</option>
+	            </select>
+	            
+	            <button type="button" id="btnSearch">검색</input>
+	        </div>
+        </form>
+        
+		<!-- 전체선택 Select -->
+		<div id="div_review_totalSelect">
+			<label for="selectAll"><input type="checkbox" name="select" id="reviewSelectAll"> <span>전체선택</span></label>
+		</div>
+        
+        <!-- 리뷰 리스트 Table -->
+        <div id="div_reviewList_T">
+	        <table border="1" id="reviewList_T">
+	        	<tr>
+	        		<th class="reviewList_T_05"></th>
+			        <th class="reviewList_T_10">No.</th>
+			        <th class="reviewList_T_05">타입</th>
+			        <th class="reviewList_T_15">작성자</th>
+			        <th class="reviewList_T_50">내용</th>
+			        <th class="reviewList_T_10">등록일</th>
+			        <th class="reviewList_T_05">별점</th>
+	      		</tr>
+	      		<tr th:each="review: ${getPageReviewList}">
+	      			<td><input type="checkbox" class="check" name="chk" th:value="${review.rvwNo}"></td>
+		        	<td th:text="${review.rvwNo}"></td>
+		        	<td th:text="${review.rvwType}"></td>
+		        	<td th:text="${review.rvwWriter}"></td>
+		        	<td th:text="${review.rvwContent}"></td>
+		        	<td th:text="${review.rvwRegdate eq null ? '' : #strings.substring(review.rvwRegdate, 0, 10)}"></td>
+		        	<td th:text="${review.rvwScore}"></td>
+		        	
+		     	 </tr>
+		    </table>
+		</div>
+		
+		<!-- 페이징 -->
+		<div class="paging">
+			<ul class="pagination" th:if="${getPageReviewList.totalElements > 0}"
+								   th:with="pageNumber = ${getPageReviewList.pageable.pageNumber},
+											pageSize = ${getPageReviewList.pageable.pageSize},
+											totalPages = ${getPageReviewList.totalPages},
+											startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+											tempEndPage = ${startPage + pageSize - 1},
+											endPage = ${tempEndPage > totalPages ? totalPages : tempEndPage}">
+				<li class="pagination_button" th:if="${pageNumber > 0}">
+					<a style="border: 0px;" th:href="${pageNumber - 1}">&#60;</a>
+				</li>
+				<li class="pagination_button" th:each="page : ${#numbers.sequence(totalPages - startPage < pageSize ? (totalPages < pageSize ? 1 :totalPages - pageSize + 1) : startPage, endPage)}">
+					<a th:href="${page - 1}" th:text="${page}"></a>
+				</li>
+				<li class="pagination_button" th:if="${pageNumber < totalPages - 1}">
+					<a style="border: 0px;" th:href="${pageNumber + 1}">&#62;</a>
+				</li>
+			</ul>
+		</div>
+		
+		<!-- 삭제/등록버튼 -->
+	    <div id="reviewTotalBtn">
+	    	<input type="button" value="리뷰 삭제" id="reviewDelete">
+	    </div>
+	</div>
+
+</body>
+</html>

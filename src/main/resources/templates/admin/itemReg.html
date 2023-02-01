@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	  
+	<!-- head 영역 시작 -->
+	<!-- 개별적으로 사용할 css, js 링크를 걸기 위해서 남겨둠 -->
+	<head>
+		<th:block layout:fragment="css">
+			<style>
+				/* '상품등록' 타이틀 */
+				.itemAdmin {
+					font-size: 40px;
+				}
+				
+				/* 상품등록Table div*/
+				#div_itemReg {
+					margin-top: 80px;
+				}
+			    #T_itemReg {
+					width: 1000px;
+					border-collapse: collapse;
+					margin: 0 auto;
+			    }
+			    #T_itemReg td {
+					border: 1.2px solid #28693F;
+					border-right: hidden;
+				}
+			    #T_itemReg th {
+					width: 30%;
+					border: 1.2px solid #28693F;
+					background-color:rgb(239, 239, 239);
+					color: #28693F;
+					border-left: hidden;
+				}
+				
+				/* 판매상태 */
+				#itemStatus_Th {
+					height: 50px;
+				}
+				#itemStatus {
+					border: 1px solid black;
+				}
+				
+				/* 카테고리 */
+				#itemCate_Th {
+					height:50px;
+				}
+				/* 카테고리 라디오버튼 */
+				#div_itemRadio 
+					input[type='radio']{
+				      accent-color:rgb(64, 128, 128);
+				      border: 2px solid #808080;
+					}
+				
+				/* 등록일 */
+				#itemRegdate {
+					height:50px;
+					font-size: 15px;
+					padding-left: 20px;
+				}
+				/* 상품이름 */
+				#itemName {
+					width: 650px;
+					height:50px;
+					font-size: 18px;
+					font-weight: bold;
+				}
+				/* 소제목 */
+				#itemMinName {
+					width: 650px;
+					height: 50px;
+					font-size: 15px;
+				}
+				/* 상품설명 */
+				#itemDetails {
+					width: 650px;
+					font-size: 15px;
+					padding-top: 10px;
+					padding-bottom: 10px;
+					resize: none;
+				}
+				/* 상품가격 */
+				#itemPrice {
+					width: 50px;
+					height: 50px;
+					text-align: right;
+					font-size: 15px;
+				}
+				/* 상품유통기한 */
+				#itemExpDate {
+					width: 650px;
+					height: 50px;
+					font-size: 15px;
+				}
+				/* 상품원산지 */
+				#itemOrigin {
+					width: 650px;
+					height: 50px;
+					font-size: 15px;
+				}
+				/* 알레르기 정보 */
+				#itemAllergyInfo {
+					width: 650px;
+					height: 80px;
+					font-size: 15px;
+					padding-top: 10px;
+					padding-bottom: 10px;
+					resize: none;
+				}
+				
+				/* 파일 첨부 */
+				#attZone {
+					width: 660px;
+					min-height: 150px;
+					padding: 10px;
+					margin: 10px;
+					border: 1px dotted lightgreen;
+				}
+				#attZone:empty:before {
+					content: attr(data-placeholder);
+					color: #999;
+					font-size: 0.9em;
+				}
+				
+				/* 상품 재고 */
+				#itemStockNm {
+		            float: left;
+		            position: relative;
+		            min-width: 114px;
+		            height: 34px;
+		            border: solid 1px #dde0e3;
+		            margin-left: 20px;
+		         }
+		         #itemStockNm_minus, #itemStockNm_plus{
+		            position: relative;
+		            width: 34px;
+		            height: 100%;
+		            background-color: #f1f2f4;
+		            border: none;
+		         }
+		         #itemStockNm_cnt{
+		            width: 40px;
+		            height: 100%;
+		            border-width: 0 1px;
+		            vertical-align: top;
+		            color: #333333;
+		            font-size: 14px;
+		            font-weight: bold;
+		            line-height: 34px;
+		            text-align: center;  
+		         }
+		         input[type="number"]::-webkit-outer-spin-button,
+		         input[type="number"]::-webkit-inner-spin-button {
+		             -webkit-appearance: none;
+		             margin: 0;
+		         }
+				
+				/* 상품등록 버튼 div */
+			    #div_itemRegBtn {
+					text-align:center;
+					margin: 50px auto;
+					margin-right: 70px;
+				}
+				/* 상품등록 버튼 */
+			    #itemRegBtn {
+					width: 150px;
+					height: 50px;
+					border: 1.2px solid #28693F;
+					border-radius: 4px;
+					background-color: white;
+					text-align: center;
+					display: inline-block;
+					color: #28693F;
+					font-size: 18px;
+					font-weight: 550;
+					letter-spacing:1px;
+					margin: 0 auto;
+					margin-top: 50px;
+			    }
+			    #itemRegBtn:hover {
+					background-color: #28693F;
+					color: white;
+					font-weight: 550;
+				}
+				/* 목록으로 버튼 */
+			    #itemListBtn {
+					width: 150px;
+					height: 50px;
+					border: 1.2px solid #28693F;
+					border-radius: 4px;
+					background-color: white;
+					text-align: center;
+					display: inline-block;
+					color: #28693F;
+					font-size: 18px;
+					font-weight: 550;
+					letter-spacing:1px;
+					margin-right: 30px;
+			    }
+			    #itemListBtn:hover {
+					background-color: #28693F;
+					color: white;
+					font-weight: 550;
+					cursor: pointer;
+				}
+			</style>
+		</th:block>
+		<th:block layout:fragment="script">
+			<script th:inline="javascript">
+				let itemPrice = 0;
+				// 추가된 파일들을 담아줄 배열. File 객체로 하나씩 담음
+			      let uploadFiles = [];
+			   
+			      $(function() {
+			         // input type="file"이 변경되면 미리보기 동작
+			         $("#btnAtt").on("change", function(e) {
+			            // input type="file"에 추가된 파일들을 변수로 받아옴
+			            const files = e.target.files;
+			            // 변수로 받아온 파일들을 배열 형태로 변환
+			            const fileArr = Array.prototype.slice.call(files);
+			            
+			            // 배열에 있는 파일들을 하나씩 꺼내서 처리
+			            for(f of fileArr) {
+			               imageLoader(f);
+			            }
+			         });
+			         
+			         $("#itemRegForm").on("submit", function(e) {
+			        	 //마지막으로 btnAtt에 uploadFiles에 있는 파일들을 담아준다.
+			        	 dt = new DataTransfer();
+			             
+			             for(f in uploadFiles) {
+			             	const file = uploadFiles[f];
+			             	dt.items.add(file);
+			             }
+			             
+			             $("#btnAtt")[0].files = dt.files;
+			             
+			             // 상품등록 버튼 클릭 시 유효성 검사
+			             if(!$("#itemName").val()) {
+								alert("상품 이름을 입력해주세요.");
+								e.preventDefault();
+								$("#itemName").focus();
+								return;
+							}
+							if(!$("#itemMinName").val()) {
+								alert("상품 소제목을 입력해주세요.");
+								e.preventDefault();
+								$("#itemMinName").focus();
+								return;
+							}
+							if(!$("#itemDetails").val()) {
+								alert("상품 설명을 입력해주세요.");
+								e.preventDefault();
+								$("#itemDetails").focus();
+								return;
+							}
+							if(!$("#itemPrice").val()) {
+								alert("상품 가격을 입력해주세요.");
+								e.preventDefault();
+								$("#itemPrice").focus();
+								return;
+							} else {
+								$("#itemPrice").val(itemPrice);
+							}
+							if(!$("#itemExpDate").val()) {
+								alert("상품 유통기한을 입력해주세요.");
+								e.preventDefault();
+								$("#itemExpDate").focus();
+								return;
+							}
+							if(!$("#itemOrigin").val()) {
+								alert("상품 원산지를 입력해주세요.");
+								e.preventDefault();
+								$("#itemOrigin").focus();
+								return;
+							}
+							if(!$("#itemAllergyInfo").val()) {
+								alert("상품 알레르기 정보를 입력해주세요.");
+								e.preventDefault();
+								$("#itemAllergyInfo").focus();
+								return;
+							}
+							if(confirm("등록하시겠습니까?")) {
+								alert("상품이 등록되었습니다.");
+								return;
+							} else {
+								e.preventDefault();
+								alert("상품등록이 취소되었습니다.");
+								return;
+							}
+			         })
+			      }); //function 끝
+			      
+			      // 미리보기 영역에 들어갈 img태그 생성 및 선택된 파일을 Base64 인코딩된 문자열 형태로 미리보기 가능하게 해줌
+			      function imageLoader(file) {
+			         uploadFiles.push(file);
+			         
+			         const reader = new FileReader();
+			         
+			         reader.onload = function(e) {
+			            // 이미지를 표출해 줄 img태크 선언
+			            let img = document.createElement("img");
+			            img.setAttribute("style", "width: 100%; height: 100%; z-index: none;");
+			            
+		               // 이미지 파일 미리보기 처리
+		               img.src = e.target.result;            
+			            
+			            // 미리보기 영역에 추가
+			            // 미리보기 이미지 태그와 삭제 버튼, 파일명을 표출하는 p태그를 묶어주는 div를 만들어 미리보기 영역에 추가
+			            $("#attZone").append(makeDiv(img, file));
+			         };
+			         
+			         // 파일을 Base64 인코딩된 문자열로 변경
+			         reader.readAsDataURL(file);
+			      }; //function 끝
+			      
+			      // 미리보기 영역에 들어갈 div(img + button + p)를 생성하고 리턴
+			      function makeDiv(img, file) {
+			         // div 생성
+			         let div = document.createElement("div");
+			         div.setAttribute("style", "display: inline-block; position: relative;"
+			          + " width: 280px; height: 210px; margin: 5px; border: 1px solid #00f; z-index: 1;");
+			         
+			         // button 생성
+			         let btn = document.createElement("input");
+			         btn.setAttribute("type", "button");
+			         btn.setAttribute("value", "x");
+			         btn.setAttribute("delFile", file.name);
+			         btn.setAttribute("style", "width: 30px; height: 30px; position: absolute;"
+			         + " right: 0px; bottom: 0px; z-index: 999; background-color: rgba(255, 255, 255, 0.1);"
+			         + " color: #f00;");
+			         
+			         // 버튼 클릭 이벤트
+			         // 버튼 클릭 시 해당 파일이 삭제되도록 설정
+			         btn.onclick = function(e) {
+			            // 클릭된 버튼
+			            const ele = e.srcElement;
+			            // delFile(파일이름) 속성 꺼내오기: 삭제될 파일명
+			            const delFile = ele.getAttribute("delFile");
+			            
+			            for(let i = 0; i < uploadFiles.length; i++) {
+			               // 배열에 담아놓은 파일들 중에 해당 파일 삭제
+			               if(delFile == uploadFiles[i].name) {
+			                  // 배열에서 i번째 한 개만 제거
+			                  uploadFiles.splice(i, 1);
+			               }
+			            }
+			            
+			            //버튼 클릭 시 btnAtt에 첨부된 파일도 삭제
+			            dt = new DataTransfer();
+			            
+			            for(f in uploadFiles) {
+			            	const file = uploadFiles[f];
+			            	dt.items.add(file);
+			            }
+			            
+			            console.log($("#btnAtt"));
+			            $("#btnAtt")[0].files = dt.files;
+			            
+			            // 해당 img를 담고있는 부모태그인 div 삭제
+			            const parentDiv = ele.parentNode;
+			            $(parentDiv).remove();
+			         }
+			         
+			         // 파일명 표출할 p태그 생성
+			         const fName = document.createElement("p");
+			         fName.setAttribute("style", "display: inline-block; font-size: 8px;");
+			         fName.textContent = file.name;
+			         
+			         // div에 하나씩 추가
+			         div.appendChild(img);
+			         div.appendChild(btn);
+			         div.appendChild(fName);
+			         
+			         // 완성된 div 리턴
+			         return div;
+			      } //function 끝
+			      
+			      //상품상태 '판매종료'인 경우 재고 0으로 자동 변경
+			      //재고 0인 경우 상품상태 '판매종료'로 자동 변경
+			      /*
+			      $(function() {
+					  
+					  }
+				  }); //function 끝
+			      */
+			      
+			      //가격 천단위 콤마
+			      function inputNumberFormat(obj) {
+					  itemPrice = obj.value.replace(",", "");
+					  obj.value = comma(uncomma(obj.value));
+				  }
+				  function comma(str) {
+					  str = String(str);
+					  return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+				  }
+				  function uncomma(str) {
+					  str = String(str);
+					  return str.replace(/[^\d]+/g, '');
+				  }
+				  
+				  
+				  //가격 숫자만입력가능
+				  $(function() {
+					  $("#itemPrice").on("keyup", function(event) {
+				        if (event.which && ((event.which  > 47 && event.which  < 58) || (event.which > 95 && event.which < 106) || event.which == 8)) {
+				            
+				        }else{
+				            alert('숫자만 입력해주세요.');
+				            $(this).val($(this).val().replace(/[^0-9]/g,""));
+				        }
+				    });
+				  });
+				  
+				//재고
+				$(function() {
+					$("#itemStockNm_plus").on("click", function(){
+						$("#itemStockNm_cnt").val(parseInt($("#itemStockNm_cnt").val()) + 1);
+						
+                    });
+                    	
+					$("#itemStockNm_minus").on("click", function(){
+						$("#itemStockNm_cnt").val(parseInt($("#itemStockNm_cnt").val()) - 1);
+						
+						if($("#itemStockNm_cnt").val() < 0) {
+							$("#itemStockNm_cnt").val(0);
+                     		alert("최소 재고수량은 0입니다.");
+                    	 	return;
+                    	 }
+                    });
+				});
+			</script>
+		</th:block>
+	</head>
+	<!-- head 영역 끝 -->
+	
+<body>
+	<div id="container" layout:fragment="content">
+		<div>
+			<h1 class="itemAdmin">상품 등록</h1>
+		</div>
+		
+	    <!-- 상품등록내용 -->
+	    <form id="itemRegForm" method="post" action="/admin/insertItem" enctype="multipart/form-data">
+	    <div id="div_itemReg">
+	      <table border="1" id="T_itemReg">
+	        <tr>
+	          <th id="itemStatus_Th">판매 상태</th>
+	          <td>&ensp;&ensp;
+	            <select name="itemStatus" id="itemStatus">
+	              <option value="Y" th:selected="${searchCondition == 'Y'}">판매중</option>
+	              <option value="S" th:selected="${searchCondition == 'S'}">재고없음</option>
+	              <option value="N" th:selected="${searchCondition == 'N'}">판매종료</option>
+	            </select>
+	          </td>
+	        </tr>
+	        <tr>
+	          <th id="itemCate_Th">카테고리</th>
+	          <td>
+	          <div id="div_itemRadio">&ensp;&ensp;
+	          	<input type="radio" name="itemCate" value="케이크"><label for="케이크">케이크&ensp;&ensp;</label>
+	          	<input type="radio" name="itemCate" value="빵" checked><label for="빵">빵&ensp;&ensp;</label>
+	          	<input type="radio" name="itemCate" value="쿠키"><label for="쿠키">쿠키&ensp;&ensp;</label>
+	          	<input type="radio" name="itemCate" value="디저트"><label for="디저트">디저트&ensp;&ensp;</label>
+	          	<input type="radio" name="itemCate" value="비건"><label for="비건">비건</label>
+	          </div>
+	          </td>
+	        </tr>
+	        <tr>
+	          <th>이름</th>
+	          <td>&ensp;&ensp;<input type="text" name="itemName" id="itemName">&ensp;&ensp;</td>
+	        </tr>
+	        <tr>
+	          <th>소제목</th>
+	          <td>&ensp;&ensp;<input type="text" name="itemMinName" id="itemMinName">&ensp;&ensp;</td>
+	        </tr>
+	        <tr>
+	          <th>설명</th>
+	          <td>&ensp;&ensp;<textarea cols="100" name="itemDetails" rows="10" id="itemDetails"></textarea></td>
+	        </tr>
+	        <tr>
+	          <th>가격</th>
+	          <td>&ensp;&ensp;
+	          	<input type="text" name="itemPrice" id="itemPrice"
+	          			onkeyup="inputNumberFormat(this)" maxlength="8"> 원
+	          </td>
+	        </tr>
+	        <tr>
+	          <th>유통기한</th>
+	          <td>&ensp;&ensp;<input type="text" name="itemExpDate" id="itemExpDate"></td>
+	        </tr>
+	        <tr>
+	          <th>원산지</th>
+	          <td>&ensp;&ensp;<input type="text" name="itemOrigin" id="itemOrigin"></td>
+	        </tr>
+	        <tr>
+	          <th>알레르기 정보</th>
+	          <td>&ensp;&ensp;<textarea name="itemAllergyInfo" id="itemAllergyInfo"></textarea></td>
+	        </tr>
+	        <tr>
+	          <th>상품 대표이미지 및 영양정보</th>
+	          <td>
+	            <div>
+	              &ensp;&ensp;<input type="file" id="btnAtt" name="uploadFiles" multiple="multiple">
+	              <div id="attZone"
+	              	data-placeholder="파일선택 버튼을 눌러 상품 대표 이미지와 영양정보 이미지를 추가하세요."></div>
+	            </div>
+	          </td>
+	        </tr>
+	        <tr>
+	          <th>재고</th>
+	          <td>&ensp;&ensp;
+	          	<div id="itemStockNm">
+					<button type="button" name="재고내리기" id="itemStockNm_minus">－</button>
+					<input type="number" name="itemStock" id="itemStockNm_cnt" value="30">
+					<button type="button" name="재고올리기" id="itemStockNm_plus">＋</button>
+				</div>
+	          </td>
+	        </tr>
+	      </table>
+      </div>
+      
+      <!-- 상품등록 버튼 -->
+      <div id="div_itemRegBtn">
+      	<!-- 목록으로 버튼 -->
+		<a href="/admin/itemList"><input type="button" value="목록으로" id="itemListBtn"></a>
+      	<input type="submit" value="상품 등록" id="itemRegBtn">
+      </div>
+      </form>
+  </div>
+</body>
+</html>

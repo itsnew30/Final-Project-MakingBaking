@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<th:block layout:fragment="script">
+	  	<script th:src="@{//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js}"></script>
+		<script th:inline="javascript">
+			
+		</script>
+	</th:block>
+	
+	<th:block layout:fragment="css">
+		<style>
+		/* 메인 */
+		.c1 {
+	      	display: flex;
+	    }
+	    .form{
+	      text-align: center;
+	      padding:1rem;
+	      width:25rem;
+	      border-radius: .5rem;
+	      box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+	      border:1px solid black;
+	      background: #fff;
+	    }
+	    .box{
+	      margin: 10px 0;
+	      width: 90%;
+	      font-size: 1rem;
+	      color: black;
+	      text-transform: none;
+	      border: 1px solid black;
+	      padding: 0.6rem 0.6rem;
+	      border-radius: 0.5rem;
+	      margin-bottom: 1rem;
+	    }
+	    .userInfo{
+	      padding-bottom:1rem;
+	      font-size: 2rem;
+	      color:black;
+	    }
+	
+	    /* 우편 */
+	    #post, #addr, #userAddr3 {
+	      margin: 1px 10px;
+	      width: 90%;
+	      font-size: 1rem;
+	      border: 1px solid black;
+	      padding: 0.6rem 0.6rem;
+	      border-radius: 0.5rem;
+	    }
+	    #post {
+	      font-size: 12px;
+	      cursor: pointer;
+	      width: 19%;
+	      float: left;
+	      background:#28693F;
+	  	  color:white;
+	  	  border: 1px solid #28693F;
+	      border-style: none;
+	    }
+		</style>
+	</th:block>
+</head>
+
+<body>
+<div layout:fragment="content">
+	<main class="centre">
+		<div class="c1" style="margin:24px 50px">
+			<form id="joinForm" class="form" method="get">
+				<h3 class="userInfo">회원정보</h3>
+					<input type="text" readonly class="box" id="userId" name="userId" th:value="${getUserInfoCheck.userId}">
+					<input type="text" id="userNm" name="userName" placeholder="이름" class="box" th:value="${getUserInfoCheck.userName}" readonly>
+			        <input type="text" id="userBirth" name="userBirth" placeholder="생년월일 ex)19901010" class="box" th:value="${getUserInfoCheck.userBirth}" readonly>
+			        <input id="userGender" name="userGender" class="box" th:value="${getUserInfoCheck.userGender}" readonly>
+			        <input type="text" id="userTel" name="userTel" placeholder="전화번호 ex)01012345678" class="box" th:value="${getUserInfoCheck.userTel}" readonly>
+			        <input type="text" id="userMail" name="userMail" placeholder="이메일 ex)xxx@xxx.com" th:value="${getUserInfoCheck.userMail}" class="box" readonly>
+			        <input id="post"  name="userAddr1" type="text" placeholder="우편번호" onclick="findAddr()" th:value="${getUserInfoCheck.userAddr1}" readonly>
+			        <input id="addr" name="userAddr2" type="text" placeholder="주소" th:value="${getUserInfoCheck.userAddr2}" readonly> <br>
+			        <input id="userAddr3" name="userAddr3" type="text" placeholder="상세주소" th:value="${getUserInfoCheck.userAddr3}" readonly>
+			</form>
+		</div>
+	</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout}">
+<head> <!-- event, notice 상세 페이지 -->
+	<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/board/getBoard.css}"/>
+	</th:block>
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+			$(function() {
+				$("#deletebtn").on('click', function(e){
+					e.preventDefault(); // a태그 이벤트 중지
+					
+					$.ajax({
+						url:'/board/board',
+						type: 'delete',
+						data: {
+							boardNo: $("#boardNo").val()
+						},
+						success: function(){
+							alert("삭제되었습니다.");
+							//window.location.href="/board/noticeList/3";
+							console.log($("#cateCode").val());
+							if($("#cateCode").val() == 3) {
+								window.location.href="/board/noticeList/3";
+							} else if ($("#cateCode").val() == 4) {
+								window.location.href="/board/eventList/4";
+							}
+							
+						},
+						error: function(e){
+							console.log(e);
+						}
+					});
+				});
+				
+			
+			});
+		</script>
+	</th:block>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div id="container" style="height: 100%; margin: 100px auto 200px;">
+		  <div id="high-container">
+		    <div id="mid-container">
+		      <div id="board-title">
+		        <h3 th:text="${getBoard.boardTitle}"></h3>
+		      </div>
+		      <div id="board-content">
+		        <textarea th:text="${getBoard.boardContent}" cols="30" rows="20" readonly></textarea>
+		      </div>
+		      <div id="btn-container">
+		      	<div id="left-btn" th:if="${getBoard.cateCode == 3}">
+		      		<a th:href='@{/board/noticeList/{cateCode} (cateCode=${getBoard.cateCode})}' id="listbtn">목록</a>
+		      	</div>
+		      	<div id="left-btn" th:if="${getBoard.cateCode == 4}">
+		      		<a th:href='@{/board/eventList/{cateCode} (cateCode=${getBoard.cateCode})}' id="listbtn">목록</a>
+		      	</div>
+		        <th:block sec:authorize="hasRole('ROLE_ADMIN')" th:remove="tag">
+		        	<form id="deleteForm" enctype="multipart/form-data">
+		        		<input type="hidden" name="boardNo" id="boardNo" th:value="${getBoard.boardNo}">
+			        	<input type="hidden" name="cateCode" id="cateCode" th:value="${getBoard.cateCode}">
+			        	<div id="right-btn">
+						  <a href="#" id="deletebtn">삭제</a>   
+						</div>
+						<div id="right-btn">
+						  <a th:href='@{/board/board/updateBoard/{cateCode}/{boardNo} (cateCode=${getBoard.cateCode}, boardNo=${getBoard.boardNo})}' id="updatebtn">수정</a>   
+						</div>
+						<!--<div id="right-btn" th:if="${getBoard.cateCode == 3}">
+						  <a th:href='@{/board/notice/updateNotice/{cateCode}/{boardNo} (cateCode=${getBoard.cateCode}, boardNo=${getBoard.boardNo})}' id="updatebtn">수정</a>   
+						</div>
+						<div id="right-btn" th:if="${getBoard.cateCode == 4}">
+						  <a th:href='@{/board/event/updateEvent/{cateCode}/{boardNo} (cateCode=${getBoard.cateCode}, boardNo=${getBoard.boardNo})}' id="updatebtn">수정</a>   
+						</div>-->
+		        	</form>
+				</th:block>
+		      </div>      
+		    </div>
+		  </div>
+		</div>
+	</div>
+</body>
+</html>

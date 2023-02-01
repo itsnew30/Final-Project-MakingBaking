@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+<head>
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+			$(function() {
+				
+			});
+			
+			function search_check(num) {
+		      if (num == '1') {
+		        document.getElementById("searchP").style.display = "none";
+		      } else {
+		        document.getElementById("searchP").style.display = "";
+		      }
+		    }
+		</script>
+	</th:block>
+	
+	<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/user/findPW.css}"/>
+	</th:block>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+		<div class="c1">
+		  <div class="custom-control custom-radio custom-control-inline" style="display: none;">
+            <input type="radio" class="custom-control-input" id="search_2" name="search_total" checked onclick="search_check(2)"> 
+            <label class="custom-control-label font-weight-bold text-black" for="search_2">비밀번호 찾기</label>
+          </div>
+          <form action="/user/findPW" id="searchP" name="forgotPw" class="form" method="POST">
+          <h3>비밀번호 찾기</h3>
+                  <div class="form-group" >
+                    <label class="font-weight-bold " for="userId"></label>
+                    <div>
+                      <input type="text" class="box" id="userId" name="userId" required="required" autofocus="autofocus" placeholder="아이디">
+                    </div>
+                  </div>
+                  <div class="form-group" >
+                    <label class="font-weight-bold " for="userName"></label>
+                    <div>
+                      <input type="text" class="box" id="userName" name="userName" required="required" autofocus="autofocus" placeholder="이름">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold " for="userMail"></label>
+                    <div>
+                      <input type="email" class="box" id="userMail"	name="userMail" placeholder="이메일">
+                    </div>
+                  </div>
+                  <a th:href="@{/user/findID}" class="findId">아이디찾기</a>
+                  <div class="form-group">
+                    <button id="searchBtn2" type="submit" class="btn2 size">확인</button>
+                  <a class="btn2 login2"	onclick="history.back();">취소</a>
+                </div>
+           </form>
+		</div>
+	</div>
+</body>
+</html>

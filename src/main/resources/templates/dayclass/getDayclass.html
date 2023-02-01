@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	  
+	<!-- head 영역 시작 -->
+	<!-- 개별적으로 사용할 css, js 링크를 걸기 위해서 남겨둠 -->
+	<head>
+		<th:block layout:fragment="css">
+		<link rel="stylesheet" th:href="@{/css/jquery-ui.min.css}">
+		<link rel="stylesheet" th:href="@{/css/jquery-ui.structure.min.css}">
+		<link rel="stylesheet" th:href="@{/css/jquery-ui.theme.min.css}">
+		<link rel="stylesheet" th:href="@{/css/dayclass.css}">
+
+		</th:block>
+		<th:block layout:fragment="script">
+			<script th:inline="javascript" th:src="@{//dapi.kakao.com/v2/maps/sdk.js?appkey=7c48f4c17dd836f517f8c8b9e41ee2af&libraries=services}"></script>
+			<script th:inline="javascript">
+				$(function() {					
+					var mapContainer = document.getElementById('kakao_map'), // 지도를 표시할 div 
+					    mapOption = {
+					        center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+					        level: 2 // 지도의 확대 레벨
+					    };  
+					
+					// 지도를 생성합니다    
+					var map = new kakao.maps.Map(mapContainer, mapOption); 
+					
+					// 주소-좌표 변환 객체를 생성합니다
+					var geocoder = new kakao.maps.services.Geocoder();
+					
+					// 주소로 좌표를 검색합니다
+					geocoder.addressSearch('서울 서초구 서초대로77길 54 서초더블유타워 13층', function(result, status) {
+					
+					    // 정상적으로 검색이 완료됐으면 
+					     if (status === kakao.maps.services.Status.OK) {
+					
+					        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+					
+					        // 결과값으로 받은 위치를 마커로 표시합니다
+					        var marker = new kakao.maps.Marker({
+					            map: map,
+					            position: coords
+					        });
+					
+					        // 인포윈도우로 장소에 대한 설명을 표시합니다
+					        var infowindow = new kakao.maps.InfoWindow({
+					            content: '<div style="width:150px;text-align:center;padding:6px 0;">MAKING BAKING</div>'
+					        });
+					        infowindow.open(map, marker);
+					
+					        // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+					        map.setCenter(coords);
+					    } 
+					}); 
+				})
+			</script>
+			
+			<script th:inline="javascript" th:src="@{/js/jquery-ui.min.js}"></script>
+			<script th:inline="javascript">	
+				const getDayclass = /*[[${dayclass}]]*/;
+				const principal = /*[[${#authentication.principal}]]*/;
+				const reviewChkList = /*[[${reviewChkList}]]*/;
+				
+				$(function() {
+					// 후기작성 안내문구
+					for(let i = 0; i < reviewChkList.length; i++) {
+						if(reviewChkList[i].reserStatus == 'PE' && reviewChkList[i].reviewYn == 'N') {
+							$("#reserStatusText").text("작성할 클래스를 선택해주세요.");
+							break;
+						} else {
+							$("#reserStatusText").text("작성할 클래스가 없습니다.");
+						}
+					}
+					
+					// 비회원이 예약하기 버튼 클릭시 로그인창 
+					$("#moveRsrvtBtn").on("click", function() {
+                 	
+                 	var offset = $("#dayclass_hr1").offset();
+                  	const isAuthenticated = $(".header > input[name='authenticate']").val();
+                  	
+		                  if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+		                     $('.login-form-container').toggleClass('active');
+		                  } else { // 아니면 예약페이지 위치로 이동
+							  $('html').animate({scrollTop : offset.top}, 300);
+						  }
+					});
+					
+					// 비회원이 메뉴바-후기 클릭시 로그인창
+					$(".m_rvw_a").on("click", function(){
+						const isAuthenticated = $(".header > input[name='authenticate']").val();
+                  	
+		                  if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+		                     $('.login-form-container').toggleClass('active');
+		                  } else { // 아니면 예약페이지 위치로 이동
+							  $('html').animate({scrollTop : offset.top}, 300);
+						  }
+					})
+					
+					// 리뷰 작성 버튼
+					$("#rvw_writeBtn").on("click", function(){
+						
+					var offset = $("#dayclass_hr2").offset();
+                  	const isAuthenticated = $(".header > input[name='authenticate']").val();
+                  		                  		  
+		                  if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+		                     $('.login-form-container').toggleClass('active');
+		                  } else { // 아니면 예약페이지 위치로 이동
+							  $('html').animate({scrollTop : offset.top}, 300);
+						  } 						
+					});
+					
+					$("#rvwContentText").on("keyup", function(e) {
+						console.log($("#rvwContentText").val());
+						$("#rvwContent").val($("#rvwContentText").val());
+					});
+					
+					// 취소 환불 문의 자세히 보기
+					$(".refundGuideBtn").on("click", function(){
+						if($("#refundGuide").css("display") == "none") {
+							$("#refundGuide").css("display", "block");	
+							$(".refundGuideBtn").text("자세히 보기 ▲");	
+						} else {
+							$("#refundGuide").css("display", "none");
+							$(".refundGuideBtn").text("자세히 보기 ▼");	
+						}
+						
+					});
+					
+					$(".cancelGuideBtn").on("click", function(){
+						if($("#cancelGuide").css("display") == "none") {
+							$("#cancelGuide").css("display", "block");		
+							$(".cancelGuideBtn").text("자세히 보기 ▲");						
+						} else {
+							$("#cancelGuide").css("display", "none");
+							$(".cancelGuideBtn").text("자세히 보기 ▼");	
+						}
+						
+					});
+				
+					// 예약 달력
+					$('#rsrvtDate').on("focus", function() {
+						$(".c_apply").animate({
+						    height: "250px"
+						},
+						500,
+						function() {
+						    
+						});
+					});
+					
+					$('#rsrvtDate').on("focusout", function() {
+						$(".c_apply").animate({
+						    height: "100px"
+						},
+						500,
+						function() {
+						    
+						});
+					});
+					
+					$("#rsrvtDate").datepicker({ dateFormat: 'yy-mm-dd', minDate: 2, maxDate:30 });
+					//$("#rsrvtDate").datepicker('setDate', 'today');
+					
+					
+				
+					// 예약 인원
+					$("#peopleNm_plus").on("click", function(){
+						$("#peopleNm_cnt").val(parseInt($("#peopleNm_cnt").val()) + 1);
+						
+						if($("#peopleNm_cnt").val() > 4) {
+							$("#peopleNm_cnt").val(4);
+							alert("최대 인원은 4명입니다.");
+							return;
+						}
+					});
+						
+					$("#peopleNm_minus").on("click", function(){
+						$("#peopleNm_cnt").val(parseInt($("#peopleNm_cnt").val()) - 1);
+						
+						if($("#peopleNm_cnt").val() < 1) {
+							$("#peopleNm_cnt").val(1);
+							alert("최소 인원은 1명입니다.");
+							return;
+						}
+					});
+					
+					$("#rsrvtDate").on('change', function() {
+						$("#dayclassRsrvtBtn").attr("disabled", false);
+						$("#dayclassRsrvtBtn").text("예약하기");
+					});
+					
+					$("select[name='partiTime']").on('change', function() {
+						$("#dayclassRsrvtBtn").attr("disabled", false);
+						$("#dayclassRsrvtBtn").text("예약하기");
+					})
+	
+					// 예약하기 클릭시 (예약날짜, 예약시간, 인원) 	
+					$("#dayclassRsrvtBtn").on("click", function() {
+						
+						const isAuthenticated = $(".header > input[name='authenticate']").val();
+              	       			
+	                  	if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+	                     	$('.login-form-container').toggleClass('active');
+	                    	 return;
+	                  	}                  	
+						if(!$("#rsrvtDate").val() || !$("select[name='partiTime']").val()) {
+							alert("예약 날짜와 시간을 선택하세요.");
+							return;
+						}
+						
+						let returnYN = 'N';
+						$.ajax({
+							url: '/dayclass/getPersonCnt',
+							type: 'post',
+							data: {
+								classNo: getDayclass.dayclassNo,
+								partiDate: $("#rsrvtDate").val(),
+								partiTime: $("select[name='partiTime']").val()
+							}, success: function(obj) {
+								console.log(obj);
+								
+								if(obj.item > 4) {
+									alert("예약인원이 찼습니다.");
+									returnYN = 'Y';
+									$("#dayclassRsrvtBtn").attr("disabled", true);
+									$("#dayclassRsrvtBtn").text("정원초과");
+									
+								} else {
+									let reserTime = "";
+			                  		
+			                  		if($(".c_apply_timeOp").val() != "A" && $(".c_apply_timeOp").val() != "P") {
+										alert("예약 시간을 선택하세요.");
+										returnYN = 'Y';
+									}
+									
+									if($(".c_apply_timeOp").val() == "A") {
+										reserTime = "오전 09:30~12:30";
+									} else if($(".c_apply_timeOp").val() == "P") {
+										reserTime = "오후 14:00~17:00";
+									}
+					
+									if(confirm("예약 날짜 : " + $("#rsrvtDate").val() 
+															+ "\n예약 시간 : " + reserTime 
+															+ "\n예약 인원 : " + $("#peopleNm_cnt").val() 
+															+"명\n\n예약하시겠습니까?" )) {						
+										
+										$("#rsvtForm").submit();								
+									} 
+									else {
+										alert("취소되었습니다.");
+										returnYN = 'Y';
+									}
+								}
+							}
+						});						
+						console.log(returnYN);
+						if(returnYN == 'Y') {
+							return;
+						}
+					});	
+					
+					const customUser = /*[[${#authentication.principal}]]*/;
+					
+					if(customUser != null) {
+						// 좋아요 버튼 클릭시
+						$("#dayclassLikeBtn").on("click", function(e) {
+							
+							const isAuthenticated = $(".header > input[name='authenticate']").val();
+							if(isAuthenticated == "false") { // false면 로그인 창 띄우기
+		                     $('.login-form-container').toggleClass('active');
+		                  	} 
+							
+							if($(this).val() == 'Y') {
+							$.ajax({
+								url: '/dayclass/like',
+								type: 'delete',
+								data: {dayclassNo: $("#dayclassNo").val()},
+								success: function(obj) {
+									console.log(obj);
+									$("#dayclassLikeBtn").text("🤍    " + obj.item.likeCnt);
+									$("#dayclassLikeBtn").val("N");
+								},
+								error: function(e) {
+									console.log(e);
+								}
+							});
+							
+						} else {
+							$.ajax({
+								url: '/dayclass/like',
+								type: 'post',
+								data: {dayclassNo: $("#dayclassNo").val()},
+								success: function(obj) {
+									console.log(obj);
+									$("#dayclassLikeBtn").text("❤    " + obj.item.likeCnt);
+									$("#dayclassLikeBtn").val("Y");
+								},
+								error: function(e) {
+									console.log(e);
+								}
+							});
+						}
+						});
+					}
+					
+					// 리뷰 등록	
+					$("#rvw_writeBtn").on("click", function(){
+						console.log($("#rvwContent").val());						 
+						 
+						 if( ! $("input[name='rvwScore']:checked").val()){
+							 alert('별점을 선택해주세요.');
+							 return;
+						 } 
+						 if( ! $("#rvwContent").val()){
+							 alert('리뷰를 작성해주세요.');
+						 } else {
+							$.ajax({
+								url: '/dayclass/insertClassRvw',
+								type:'post',
+								data:{
+									rvwReferNo: $("#dayclassNo").val(),
+									rvwContent: $("#rvwContent").val(),
+									rvwScore: $("input[name='rvwScore']:checked").val(),								
+									rvwReserNo: $("#rvwReserNo").val(),
+									rvwType: 'class'
+								}, success: function(obj) {
+									console.log(obj);
+									location.reload();								
+									alert("리뷰가 등록되었습니다.");
+								}, error: function(e) {
+									console.log(e);
+									alert("리뷰 등록에 실패하였습니다.");
+								}
+							});
+								
+							} 						
+					}); 
+					
+					// 리뷰 글자 제한
+					$('#rvwContentText').keyup(function (e) {
+						let content = $(this).val();
+					    
+					    // 글자수 세기
+					    if (content.length == 0 || content == '') {
+					    	$('.textCount').text('0자');
+					    } else {
+					    	$('.textCount').text(content.length + '자');
+					    }
+					    
+					    // 글자수 제한
+					    if (content.length > 150) {
+					    	// 150자 부터는 타이핑 되지 않도록
+					        $(this).val($(this).val().substring(0, 150));
+					        // 150자 넘으면 알림창 뜨도록
+					        alert('글자수는 150자까지 입력 가능합니다.');
+					    };
+					});
+					
+					//
+					$("#rvw_array").on("change", function() {
+						reviewPagingAndOrder(0, $("#rvw_array").val());
+					});
+					
+					// 리뷰 페이징
+					$(document).on("click", ".paging_btn a", function(e) {
+						e.preventDefault();
+						reviewPagingAndOrder($(e.target).attr("href"), $("#rvw_array").val());
+					});
+					
+					// 수업날짜 클릭시 리뷰창 나타내기
+					$("input[name='reviewReserNo']").on("click", function() {
+						$(".rvwWriteSection").css("display", "block");
+						$("#rvwReserNo").val($(this).val());
+					});
+	
+						console.log()
+					// 클래스 후기 textarea반응형	
+					$('.c_intro_text').each(function() {
+					    var offset = this.offsetHeight - this.clientHeight;
+					 
+					    var resizeTextarea = function(el) {
+					        $(el).css('height', 'auto').css('height', el.scrollHeight + offset);
+					    };
+					    
+					    resizeTextarea(this);
+					});
+				}); 
+				
+				// ?????
+				function reviewPagingAndOrder(page, condition) {
+					console.log(page);
+					console.log(condition);
+
+						$.ajax({
+						url: '/dayclass/dayclass/' + $("#dayclassNo").val(),
+						type: 'post',
+						data: {
+							page: page,
+							searchCondition: condition
+						},
+						success: function(obj) {
+							console.log(obj);
+							
+							let htmlStr = "";
+							
+							for(let i=0; i<obj.pageItems.content.length; i++) {
+								htmlStr += `
+									<tr>
+			                          <td>
+			                          	<span>`;
+			                          	for(let j = 0; j < obj.pageItems.content[i].rvwScore; j++) {
+											htmlStr += `⭐`;
+										  }
+								htmlStr +=  `</span>
+		                          	  </td>
+			                          <td>${obj.pageItems.content[i].rvwContent}</td>
+			                          <td>${obj.pageItems.content[i].rvwRegdate.substring(0,10)}</td>
+			                          <td>${principal != 'anonymousUser' && principal.user.userRole == 'ROLE_ADMIN' 
+			                         	   ? obj.pageItems.content[i].rvwWriter 
+			                         	   : obj.pageItems.content[i].rvwWriter.substring(0, obj.pageItems.content[i].rvwWriter.length - 3) + '***'}</td>
+			                        </tr>
+								`;
+							}
+							
+							$(".rvw_list tbody").html(htmlStr);
+							
+							htmlStr = "";
+							
+							let pageNumber = obj.pageItems.pageable.pageNumber;
+							let pageSize = obj.pageItems.pageable.pageSize;
+							let totalPages = obj.pageItems.totalPages;
+							let startPage = Math.floor((pageNumber / pageSize) * pageSize + 1);
+							let tempEndPage = startPage + pageSize -1;
+							let endPage = tempEndPage > totalPages ? totalPages : tempEndPage;
+							
+							if(pageNumber > 0) {
+								htmlStr += `
+									<li class="paging_btn">
+										<a style="border: 0px;" href="${pageNumber - 1}">&#60;</a>
+									</li>
+								`;
+							}
+							
+							let realStart = totalPages - startPage < pageSize ? 
+												totalPages < pageSize ? 1 : totalPages - pageSize + 1 
+											: startPage;
+							
+							for(let i = realStart; i <= endPage; i++) {
+								if(pageNumber == i-1) {
+									htmlStr += `<li class="paging_btn">
+											   	   <a class="present" href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								} else {
+									htmlStr += `<li class="paging_btn">
+											   	   <a href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								}
+							}
+							
+							if(pageNumber < totalPages - 1) {
+								htmlStr += `<li class="paging_btn">
+										       <a style="border: 0px;" href="${pageNumber + 1}">&#62;</a>
+									        </li>
+								`;
+							}
+						
+							$(".paging").html(htmlStr);
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					}); 
+					
+					
+				}; 
+				
+			</script>
+		</th:block>  
+	</head>
+	<!-- head 영역 끝 -->
+	
+	<body>
+	<div layout:fragment="content">
+	  <div class="entire-wrap" >	  
+	  <div class="dayclass">
+	    <main> 
+        <form id="rsvtForm" action="/dayclass/reserDayclass" method="post">
+    	  <input type="hidden" id="dayclassNo" name="dayclassNo" th:value="${dayclass.dayclassNo}">
+    	  <input type="hidden" id="totalPayPrice" name="totalPayPrice">
+	      <section> 
+	        <div class="dc_banner_container">
+	          <div class="dc_banner">
+	            <div class="banner_mainImg">
+	              <img class="banner_main_img" th:src="@{'/dayclass/' + ${dayclass.fileName}}" width="400px" height="300px">
+	            </div>
+	            <div class="banner_explain">   
+	              <div class="class_hr1">     
+	              <h2 th:text="${dayclass.dayclassName}"></h2>        
+	              </div>
+	              <div class="banner_explain_MinName">
+	              	<p th:text="${dayclass.dayclassMinName}"></p>
+	             </div>
+	             <div class="banner_explain_div">
+	              <div class="banner_explain_details">
+	                <span><img src="/images/class_day.png" width="17px">&ensp;원데이 클래스&ensp;</span>  
+	                <span><img src="/images/class_time.png" width="16.5px" th:text="${dayclass.dayclassDurationTime}">시간</span>
+	                <span><img src="/images/class_location.png" width="18px" th:text="${#strings.substring(dayclass.dayclassAddress, 0, 6)}"></span>
+	              </div>
+	              <div class="banner_explain_KRW">
+	                <span>KRW&nbsp;</span><span th:text="${#numbers.formatInteger(dayclass.dayclassPrice, 3, 'COMMA')}" class="dayclassPrice"></span>
+	              </div> 
+	              <div class="banner_explain_btn">
+	                <span><button type="button" id="moveRsrvtBtn" value="dayclassRsrvt">예약하기  
+	                </button></span>
+	                <span id="likeSpan"><button type="button" id="dayclassLikeBtn" 
+	                	th:value="${likeYn}" th:text="${likeYn == 'Y' ? '❤   ' : '🤍   '} + ${likeCnt}"></button></span>
+	              </div>
+		         </div>  
+	            </div>  
+	          </div>
+	        </div>
+	      </section>
+	      <section class="dc_menu">
+	        <div class="menu">
+	          <ul >
+	            <li><a th:href="@{#classIntro}" 
+	              class="m_intro_a">클래스 소개</a></li>
+	            <li><a th:href="@{#dayclass_hr2}" 
+	              class="m_rvw_a">클래스 후기</a></li>
+	            <li><a th:href="@{#dayclass_hr1}" 
+	              class="m_apply_a">신청하기</a></li>
+	            <li><a th:href="@{#dayclass_hr3}" 
+	              class="m_cancel_a">취소/환불</a></li>
+	          </ul>
+	        </div>    
+	      </section>
+	      <section class="dc_contents">
+	        <div class="dc_contents_container">
+	          <div class="contents">
+	            <h3 class="c_intro_title" name="클래스소개" th:text="${dayclass.dayclassName}"></h3>
+	            <div class="c_intro" id="classIntro" >
+	              	             
+	              <textarea class="c_intro_text"  th:text="${dayclass.dayclassDetails}" readonly></textarea>
+	              
+	            </div>	            
+	            <hr class="dayclass_hr">
+	            <div class="c_map" id="classMap">
+	              <h3 class="c_map_title">클래스 위치</h3>
+	              <p class="kakao_location" th:text="${dayclass.dayclassAddress}"></p>
+	              <div id="kakao_map" ></div>
+	            </div>
+	            
+				<hr class="dayclass_hr" id="dayclass_hr1">
+	          	<div>
+					<p></p>
+	          	</div>
+	            <div class="c_apply" id="classApply" >
+	              <ul >
+	                <li><img class="apply_img" src="/images/class_day.png" width="17px"> 예약 날짜  
+	                	<input type="text" id="rsrvtDate" name="reserDate">
+	                </li>	           
+	                <li><img class="apply_img" src="/images/class_time.png" width="17px"> 예약 시간  
+	                	<select class="c_apply_timeOp" name="partiTime">
+	                		<option disabled selected>날짜 선택</option>
+	              			<option value="A">오전 09:30~12:30</option>
+	               			<option value="P">오후 14:00~17:00</option>
+						</select>
+					</li>
+					<li><img class="apply_img" src="/images/class_people.png" width="23px"> 예약 인원
+					</li>
+					<li>	
+						<div class="peopleNm">
+							<button type="button" name="수량내리기" id="peopleNm_minus" class="peopleNm_minus">－</button>
+							<input type="number" id="peopleNm_cnt" class="peopleNm_cnt" min="1" max="4" value="1" name="reserPersonCnt">
+							<button type="button" name="수량올리기" id="peopleNm_plus" class="peopleNm_plus">＋</button>
+						</div>
+					</li>
+					<li>
+					<div class="apply_btn">
+	                	<span><button type="button" id="dayclassRsrvtBtn" value="dayclassRsrvt">예약하기 
+	                	</button></span>
+	              	</div>
+					</li>
+	              </ul>
+	             </div>
+				 </form>
+	            
+	            
+	            <hr  class="dayclass_hr" id="dayclass_hr2">
+	            <div  class="c_rvw" id="classReview">
+	            
+	              <h3 class="c_rvw_title" >클래스 후기</h3>
+	              <div th:if=${!#lists.isEmpty(reviewChkList)} class="c_rvw_write">
+	              	<div class="rvw_write_member">
+	              		<form class="rvw_write_form" action="/dayclass/insertClassRvw" method="post" >
+	              			<div class="rvw_reserInfo">
+	              		
+	              				<p id="reserStatusText"></p>
+	              			
+	              			</div>
+	              			<div class="rvw_reserNo" th:each="reviewChk : ${reviewChkList}">						 	
+						 		<span th:if="${reviewChk.reserStatus == 'PE' && reviewChk.reviewYn == 'N'}">							 		
+							 		<input type="radio" name="reviewReserNo" th:value="${reviewChk.reserNo}"
+							 			   th:id="'radio' + ${reviewChk.reserNo}">
+							 		<label th:for="'radio' + ${reviewChk.reserNo}"
+							 			   th:text="'수업 날짜 : ' + ${reviewChk.partiDate}"></label>
+						 		</span>
+						 	</div>	
+	              			<input type="hidden" id="rvwContent" name="rvwContent">
+	              			<input type="hidden" id="rvwReserNo" name="rvwReserNo">
+	              			<div class="rvwWriteSection" style="display: none;">
+	              				<div class="star-wrapper">
+		              				<fieldset>
+										<input type="radio" name="rvwScore" value="5" class="rvwScore" id="rate1"><label
+											for="rate1">★</label>
+										<input type="radio" name="rvwScore" value="4" class="rvwScore" id="rate2"><label
+											for="rate2">★</label>
+										<input type="radio" name="rvwScore" value="3" class="rvwScore" id="rate3"><label
+											for="rate3">★</label>
+										<input type="radio" name="rvwScore" value="2" class="rvwScore" id="rate4"><label
+											for="rate4">★</label>
+										<input type="radio" name="rvwScore" value="1" class="rvwScore" id="rate5"><label
+											for="rate5">★</label>							
+									</fieldset>
+									<div class="textLength" >
+								      <p class="textCount">0자</p>
+								      <p class="textTotal">/150자</p>
+									</div>  
+	              				</div>
+								<textarea class="rvwContentText" id="rvwContentText" name="rvwContentText" placeholder=" 클래스 리뷰를 작성해주세요."></textarea>
+							 	<div class="writeBtn_div"> 
+		              			  <button class="rvw_writeBtn" id="rvw_writeBtn" type="button">등록</button>
+		              			</div>
+	              			</div>
+	              		</form>
+	              	
+	              	</div>
+	              	</div>
+	              	
+	          
+	                <div class="rvw_wirte_detail" id="classReviewList">
+	                  <div class="rvw_option"> 
+	                    <select name="rvw_array" id="rvw_array">	     
+	                      <option value="NEW" th:selected="${searchCondition == '' || searchCondition == 'NEW'}">최신순</option>
+	                      <option value="OLD" th:selected="${searchCondition == 'OLD'}">오래된순</option>
+	                      <option value="HIGH" th:selected="${searchCondition == 'HIGH'}">평점 높은순</option>
+	                      <option value="LOW" th:selected="${searchCondition == 'LOW'}"> 평점 낮은순</option>
+	                    </select>
+	                  </div>
+	                  <span>
+	                    <table class="rvw_list">
+	                      <colgroup>
+	                        <col width="140">
+	                        <col width="">
+	                        <col width="130">
+	                        <col width="120">
+	                      </colgroup>
+	                      <thead>
+	                        <tr>
+	                          <th scope="col">평점</th>
+	                          <th scope="col">내 용</th>
+	                          <th scope="col">작성일자</th>
+	                          <th scope="col">작성자</th>
+	                        </tr>
+	                      </thead>
+	                      <tbody>
+	                        <tr th:each="review : ${reviewList}">
+	                          <td>
+	                          	<span th:each="num : ${#numbers.sequence(1, review.rvwScore)}">⭐</span>
+                          	  </td>
+	                          <td th:text="${review.rvwContent}"></td>
+	                          <td th:text="${review.rvwRegdate eq null ? '' : #strings.substring(review.rvwRegdate, 0, 10)}"></td>
+	                          <td sec:authorize="hasRole('ROLE_ADMIN')" th:text="${review.rvwWriter}"></td>
+	                          <td sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${review.rvwWriter.length() > 4 ? review.rvwWriter.substring(0, review.rvwWriter.length()-3) + '***' : review.rvwWriter}"></td>
+	                        </tr>
+	                      </tbody>
+	                    </table>
+	                    <div class="rvw_paging">
+	                      <ul class="paging" style="display: flex; justify-content: center;" 
+							th:if="${reviewList.totalElements > 0}"
+							th:with="pageNumber = ${reviewList.pageable.pageNumber},
+												pageSize = ${reviewList.pageable.pageSize},
+												totalPages = ${reviewList.totalPages},
+												startPage =${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+												tempEndPage = ${startPage + pageSize -1}, 
+												endPage = ${tempEndPage > totalPages ? totalPages : tempEndPage}">
+								<li class="paging_btn" th:if="${pageNumber > 0}">
+									<a th:href="@{${pageNumber - 1}}">◀</a>
+								</li>
+								<li class="paging_btn" th:each="page : ${#numbers.sequence(totalPages - startPage < pageSize ? (totalPages < pageSize ? 1 :totalPages - pageSize + 1) : startPage, endPage)}">
+									<a th:href="@{${page - 1}}" th:text="${page}"></a>
+								</li>
+								<li class="paging_btn" th:if="${pageNumber < totalPages - 1}">
+									<a th:href="@{page=${pageNumber + 1}}">▶</a>
+								</li>
+							</ul>
+	                    </div>
+	                  </span>
+	                </div>
+	                
+	              
+	            </div>
+
+	          
+	          <hr class="dayclass_hr" id="dayclass_hr3">
+	          <div class="c_cancel" id="classCancle" >
+	            <h3 class="c_cancel_title">취소/환불</h3>
+	            <p class="c_cancel_text_A">궁금하신 점이나 서비스 이용에 불편한 점이 있으신가요?</p>
+	            <p class="c_cancel_text_B">문제가 되는 부분을 사진을 찍어 아래 중 편하신 방법으로 접수해 주시면 
+	              빠르게 도와드리겠습니다.</p>
+	          </div>
+	          <div class="c_Qna">
+	            <ul style="padding-left: 0;">
+	              <li>
+	                <strong>| 전화 문의</strong>
+	                <p class="c_Qna_text_A">
+	                  월~금요일 오전 9시 - 오후 6시<br>
+	                  주말/공휴일 오전 9시 - 오후 3시
+	                </p>
+	              </li>
+	              <li>
+	                <strong>| 홈페이지 문의</strong>
+	                <p class="c_Qna_text_B">
+	                  365일<br>
+	                  로그인 > 마이페이지 > 1:1 문의
+	                </p>
+	                <p class="c_Qna_text_C">
+	                  고객센터 운영 시간에 순차적으로 답변해드리겠습니다.
+	                </p>
+	              </li>
+	            </ul>
+	          </div>
+	          <div class="c_guide">
+	            <div class="c_refundGuide">
+	              <strong class="c_refundG_title">교환 및 환불 안내</strong>
+	              <p class="c_refundG_text">교환 및 환불이 필요하신 경우 고객센터로 문의해주세요.</p>
+	              <button type="button" class="refundGuideBtn">자세히 보기 ▼</button>
+	            </div>
+	            <div id="refundGuide">			       
+		            <div class="c_refundG_01">
+		              <strong class="c_refundG_01title">01. 상품에 문제가 있는 경우</strong>
+		              <p class="c_refundG_01text_A">받으신 상품이 표시/광고/내용 또는 계약과 다른 경우에는 상품을 받은 날부터 1개월 이내,
+		              그 사실을 알게 된 날부터 14일 이내에 교환 및 환불을 요청하실 수 있습니다.
+		              
+		              <span class="c_refundG_01text_B">※ 배송 상품에 문제가 있는 것으로 확인되면 배송비는 MakingBaking이 부담합니다.</span>
+		              </p>
+		            </div>
+		            <div class="c_refundG_02">
+		              <strong class="c_refundG_02title">02. 단순 변심, 주문 착오의 경우</strong>
+		              <p class="c_refundG_02text">
+		              	<strong class="c_refundG_02text_A">실온/냉장 식품</strong><br>
+		              	재판매가 불가한 상품의 특성상, 단순변심, 주문 착오 시 교환 및 반품이 어려운 점 양해 부탁드립니다.
+		              	상품에 따라 조금씩 맛이 다를 수 있으며, 개인의 기호에 따라 같은 상품도 다르게 느끼실 수 있습니다.			              	
+		              	
+		              	<strong class="c_refundG_02text_B">유통기한 30일 이상 식품</strong><br>
+		              	상품을 받은 날부터 7일 이내 관리자에게 문의해주세요.
+		              	
+		              	<span>※ 단순 변심으로 인한 배송 상품 교환 또는 환불의 경우 고객님께서 배송비 6,000원을 부담하셔야 합니다.(주문건 배송비를 결제하셨을 경우 3,000원)</span>	
+		              </p>
+		            </div>		            
+		            <div class="c_refundG_03">
+		              <strong class="c_refundG_03title">03. 교환/반품이 불가한 경우</strong>
+		              <p class="c_refundG_03text">
+		              	다음에 해당하는 교환/환불 신청은 처리가 어려울 수 있으니 양해 부탁드립니다.
+		              	<span>
+		              	- 고객님의 책임 있는 사유로 상품이 멸시되거나 훼손된 경우
+		              	- 고객님의 사용 또는 일부 소비로 상품의 가치가 감소한 경우
+		              	- 시간이 지나 다시 판매하기 곤란할 정도로 상품의 가치가 감소한 경우
+		              	- 복제가 가능한 상품의 포장이 훼손된 경우
+		              	- 고객님의 주문에 따라 개별적으로 생산되는 상품의 제작이 이미 진행된 경우
+		              	</span>
+		              </p>
+		            </div>
+	            </div> 
+	            <div class="c_cancelGuide">
+	              <strong class="c_cancelG_title">주문 및 예약 취소 안내</strong>
+	              <p class="c_cancelG_text">상품 주문 및 클래스 예약을 취소하실 수 있습니다.</p>
+	              <button type="button" class="cancelGuideBtn">자세히 보기 ▼</button>
+	            </div>
+	            <div id="cancelGuide">
+		            <div class="c_cancelG_01">
+		              <strong class="c_cancelG_01title">상품 주문 취소 관련</strong>
+		              <p class="c_cancelG_01text">
+		              - [배송준비중] 부터는 취소가 불가하니, 반품으로 진행해주세요.
+		              - 상품에 반품이 불가할 수 있습니다.
+		              - 일부 상품은 배송 3~4일 전에만 취소 가능합니다
+		              - 주문상품의 부분취소는 불가능합니다. 전체 주문 취소 후 다시 구매 해주세요.
+		              </p>
+		            </div>
+		            <div class="c_cancelG_02">
+		              <strong class="c_cancelG_02title">클래스 예약 취소 관련</strong>
+		              <p class="c_cancelG_02text">
+		              	<strong class="c_cancelG_02text_A">클래스 예약 취소</strong><br>
+		              	- 클래스 예약 취소는, 클래스 진행 1일 전까지 취소 가능합니다.
+		              	- 클래스 예약은 당일 취소가 불가합니다.
+		              	
+		              	<strong class="c_cancelG_02text_B">클래스 예약 환불</strong><br>
+					 	- 클래스 진행 후 환불은 불가합니다.
+					  	- 클래스 진행 1일 전 취소시 환불 가능하니, 고객센터에 문의해주세요.
+		              </p>
+		            </div>
+		          </div>
+	          	
+	          </div>   
+	         </section>  
+	  		</main>       
+	       </div>
+	       </div>
+	       </div>
+	</body>
+</html>

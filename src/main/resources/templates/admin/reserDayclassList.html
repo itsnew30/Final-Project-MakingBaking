@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	  
+	<!-- head 영역 시작 -->
+	<!-- 개별적으로 사용할 css, js 링크를 걸기 위해서 남겨둠 -->
+	<head>
+		<th:block layout:fragment="css">
+			<style>
+			    #orderAndReserAdmin {
+					font-size: 40px;
+				}
+				#orderAndReserBtn  {
+					margin: 50px 0 0 0;
+				}
+				
+				/* 선택탭 */
+				#orderAndReserBtn {
+					margin-top: 20px;
+				}
+				#reserDayclass {
+					color: #4A4A4A;
+					font-weight: bold;
+					font-size: 25px;
+					margin-right: 50px;
+				}
+				#reserDayclass:hover {
+					color: #28693F;
+					font-weight: bold;
+					font-size: 25px;
+				}
+				#orderItemList {
+					color: #4A4A4A;
+					font-weight: bold;
+					font-size: 25px;
+				}
+				#orderItemList:hover {
+					color: #28693F;
+					font-weight: bold;
+					font-size: 25px;
+				}
+				
+				/* 검색 div */
+				#reser_search {
+					display: flex;
+					margin: 80px auto;
+				}
+				#searchCondition {
+					height: 35px;
+					border: 1px solid #28693F;
+				}
+				/* 검색창 */
+				#inputSearch {
+					width: 250px;
+					height: 35px;
+					border: 1px solid #28693F;
+					margin: auto 10px;
+					display: inline-block;
+				}
+				#selectSearch1, #selectSearch2,  #selectSearch3 {
+					height: 35px;
+					border: 1px solid #28693F;
+					margin: auto 10px;
+				}
+				/* 검색 버튼 */
+				#btnSearch {
+					width: 80px;
+					height: 35px;
+					border: 1.2px solid #28693F;
+					background-color: white;
+					text-align: center;
+					color: #28693F;
+					font-size: 16px;
+					font-weight: 550;
+					letter-spacing:1px;
+					display: inline-block;
+					cursor: pointer;
+				}
+				
+				/* 테이블 */
+				#reserList_T {
+					width: 1200px;
+					border: 1.2px solid #28693F;
+					border-collapse: collapse;
+					border-left: hidden;
+					border-right: hidden;
+					border-top:hidden;
+				}
+				#reserList_T th {
+					background: #28693F;
+					color: white;
+					height: 35px;
+				}
+				
+				.reserList_T_10 {
+					 width: 10%;
+				}
+				.reserList_T_15 {
+					 width: 15%;
+				}
+				
+				#reserList_T td {
+					border-bottom: 1.2px solid #28693F;
+					text-align: center;
+					height: 80px;
+				}
+				
+				.reserNo {
+					width:180px;
+					color: black;
+					text-align: center;
+					font-size: 18px;
+					text-decoration: none;
+					cursor: pointer;
+				}
+				.reserNo:hover {
+					text-decoration: underline;
+					color: #28693F;
+					font-weight: bold;
+				}
+				.partiName {
+					width:180px;
+					text-align: center;
+					font-size: 18px;
+				}
+				.classNo {
+					width:120px;
+					text-align: center;
+					font-size: 18px;
+				}
+				.partiDate {
+					width:180px;
+					text-align: center;
+					font-size: 18px;
+				}
+				.partiTime {
+					width:180px;
+					text-align: center;
+					font-size: 18px;
+				}
+				.reserStatus {
+					width:180px;
+					text-align: center;
+					font-size: 18px;
+				}
+				
+				.partiStatus {
+					border: 1px solid black;
+				}
+			    /* 변경버튼 */
+				.btnMod {
+					width:80px;
+					height:30px;
+					border: 1.2px solid #28693F;
+					background-color: white;
+					text-align: center;
+					color: #28693F;
+					font-weight: bold;
+					display: inline-block;
+					cursor: pointer;
+					margin-top: 8px;
+				}
+			    
+			    /* 페이징처리 */
+			    .paging {
+					text-align: center;
+					margin-top: 50px;
+				}
+			    .pagination {
+			      display: flex;
+			      justify-content: center;
+			      align-items: center;
+			      margin-bottom: 20px;
+			    }    
+			    .paging a{
+				  display: block;
+				  margin: 0 3px;
+				  border: 1px solid #ccc;
+				  width: 40px;
+				  height: 40px;
+				  line-height: 35px;
+				  text-align: center;
+			      color: #8c8c8c;
+			      font-size: 25px;
+			      font-weight: 600;
+			    }
+			    .paging a:hover {
+			      color: #28693F;
+			    }
+			    .paging a:focus {
+					background:#28693F;
+					color: white;
+				}
+				.paging .pagination .pagination_button a.present {
+					border-color: #28693F;
+					background: #28693F;
+					color: white;
+				}
+			</style>
+		</th:block>
+		<th:block layout:fragment="script">
+			<script th:inline="javascript">
+				let changeRows = [];
+				let pageNum;
+				
+				$(function() {
+					//검색창(상품카테, 판매상태)
+					$("#searchCondition").on("change", function() {
+						if($(this).val() == 'PARTITIME') {
+							$("#inputSearch").hide();
+							$("#selectSearch2").hide();
+							$("#selectSearch3").hide();
+							$("#selectSearch1").show();
+							$("#inputSearch").attr("disabled", true);
+							$("#selectSearch2").attr("disabled", true);
+							$("#selectSearch3").attr("disabled", true);
+							$("#selectSearch1").attr("disabled", false);
+						} else if($(this).val() == 'RESERSTATUS') {
+							$("#inputSearch").hide();
+							$("#selectSearch1").hide();
+							$("#selectSearch3").hide();
+							$("#selectSearch2").show();
+							$("#inputSearch").attr("disabled", true);
+							$("#selectSearch1").attr("disabled", true);
+							$("#selectSearch3").attr("disabled", true);
+							$("#selectSearch2").attr("disabled", false);
+						} else if($(this).val() == 'PARTISTATUS') {
+							$("#inputSearch").hide();
+							$("#selectSearch1").hide();
+							$("#selectSearch2").hide();
+							$("#selectSearch3").show();
+							$("#inputSearch").attr("disabled", true);
+							$("#selectSearch1").attr("disabled", true);
+							$("#selectSearch2").attr("disabled", true);
+							$("#selectSearch3").attr("disabled", false);
+						} else if($(this).val() != 'PARTITIME' && $(this).val() != 'RESERSTATUS' && $(this).val() != 'PARTISTATUS') {
+							$("#inputSearch").show();
+							$("#selectSearch1").hide();
+							$("#selectSearch2").hide();
+							$("#selectSearch3").hide();
+							$("#inputSearch").attr("disabled", false);
+							$("#selectSearch1").attr("disabled", true);
+							$("#selectSearch2").attr("disabled", true);
+							$("#selectSearch3").attr("disabled", true);
+						}
+					});
+					
+					//검색창 검색버튼 클릭 시
+					$("#btnSearch").on('click',function() {
+						$("input[name='page']").val(0);
+						$("#searchForm").submit();
+					});
+					
+					//예약리스트 페이징 처리
+					$(document).on("click", ".pagination a", function(e) {
+						e.preventDefault();
+						pageNum = $(this).attr("href");
+						reserListPaging(pageNum, $("#searchCondition").val());
+					});
+					
+					$(document).on("click", "button[name='btnMod']" , function(e) {
+						console.log($(e.target));
+						fnUpdatePartiStatus($(e.target).attr("data-current-index"));
+					});
+				});
+				
+				//변경버튼 클릭 시
+				function fnUpdatePartiStatus(num) {
+		           
+		            let formData = new FormData($("#updateForm")[0]);
+		            formData.append("reserNo", $("#reserNo" + num).val());
+		            formData.append("partiStatus", $("#partiStatus" + num).val());
+		           console.log($("#reserNo" + num).val());
+		           console.log($("#partiStatus" + num).val());
+		           $.ajax({
+		              url: '/admin/updatePartiStatus',
+		              type: 'put',
+		              data: {
+						  reserNo: $("#reserNo" + num).val(),
+						  partiStatus: $("#partiStatus" + num).val()
+					  },
+		              success: function (obj) {
+		                 console.log(obj);
+		                 alert("참여현황이 수정되었습니다.");
+		                 $("#partiStatus" + num).parent().text(obj.item.updatePartiStatus.partiStatus);
+		                 $("#partiStatus" + num).remove();
+		                 $("#btnMod" + num).remove();
+		                 
+		                 //val(obj.item.updatePartiStatus.partiStatus);
+		                 
+		              },
+		              error: function (e) {
+		                 console.log(e);
+		              }
+		           });
+				 }
+				
+				//페이징
+				function reserListPaging(page, condition) {
+					console.log(page);
+					console.log(condition);
+
+						$.ajax({
+						url: '/admin/reserDayclassList',
+						type: 'post',
+						data: {
+							page: page,
+							searchCondition: condition
+						},
+						success: function(obj) {
+							console.log(obj);
+							
+							let htmlStr = "";
+							
+							htmlStr += `
+							
+								<tr>
+					        		<th class="reserList_T_15">예약번호</th>
+							        <th class="reserList_T_15">예약자</th>
+							        <th class="reserList_T_10">클래스번호</th>
+							        <th class="reserList_T_15">예약날짜</th>
+							        <th class="reserList_T_15">예약시간</th>
+							        <th class="reserList_T_15">예약상태</th>
+							        <th class="reserList_T_15">참여현황</th>
+					      		</tr>
+					      	`;
+							
+							for(let i=0; i<obj.pageItems.content.length; i++) {
+								htmlStr += `
+									<tr>
+							        	<td>
+											<a href="/mypage/getReserDetail/${obj.pageItems.content[i].reserNo}">
+												<input type="text" readonly name="reserNo" class="reserNo" id="reserNo${i}" value="${obj.pageItems.content[i].reserNo}">
+											</a>
+										</td>
+										<td><input type="text" readonly name="partiName" class="partiName" id="partiName${i}" value="${obj.pageItems.content[i].partiName}"></td>
+										<td><input type="text" readonly name="classNo" class="classNo" id="classNo${i}" value="${obj.pageItems.content[i].classNo}"></td>
+										<td><input type="text" readonly name="partiDate" class="partiDate" id="partiDate${i}" value="${obj.pageItems.content[i].partiDate}"></td>
+										<td><input type="text" readonly name="partiTime" class="partiTime" id="partiTime${i}" value="${obj.pageItems.content[i].partiTime}"></td>
+										<td><input type="text" readonly name="reserStatus" class="reserStatus" id="reserStatus${i}" value="${obj.pageItems.content[i].reserStatus}"></td>
+									`;
+								
+									if(obj.pageItems.content[i].partiStatus != 'PS') {
+										htmlStr += `
+											<td>
+											${obj.pageItems.content[i].partiStatus}
+										</td>
+										`;
+									} else {
+										htmlStr += `
+												<td>
+													<select id="partiStatus${i}" class="partiStatus">
+														<option value="PS">진행예정 (PS)</option>
+										        		<option value="PC">진행완료 (PC)</option>
+										        		<option value="NS">노쇼 (NS)</option>
+										        		<option value="CC">예약/결제취소(CC)</option>
+													</select>
+													<button type="button" class="btnMod" id="btnMod{i}" data-current-index=${i} name="btnMod">변경</button>
+												</td>
+										`;
+									}
+								htmlStr += `
+									</tr>
+								`;
+							}
+							
+							
+							$("#reserList_T").html(htmlStr);
+							
+							htmlstr = "";
+						
+							let pageNumber = obj.pageItems.pageable.pageNumber;
+							let pageSize = obj.pageItems.pageable.pageSize;
+							let totalPages = obj.pageItems.totalPages;
+							let startPage = Math.floor((pageNumber / pageSize) * pageSize + 1);
+							let tempEndPage = startPage + pageSize -1;
+							let endPage = tempEndPage > totalPages ? totalPages : tempEndPage;
+							console.log(pageNumber);
+							console.log(pageSize);
+							console.log(totalPages);
+							console.log(startPage);
+							console.log(tempEndPage);
+							console.log(endPage);
+							
+							if(pageNumber > 0) {
+								htmlstr += `
+									<li class="pagination_button">
+										<a style="border: 0px;" href="${pageNumber - 1}">&#60;</a>
+									</li>
+								`;
+							}
+							
+							let realStart = totalPages - startPage < pageSize ? 
+												totalPages < pageSize ? 1 : totalPages - pageSize + 1 
+											: startPage;
+							
+							for(let i = realStart; i <= endPage; i++) {
+								if(pageNumber == i-1) {
+									htmlstr += `<li class="pagination_button">
+											   	   <a class="present" href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								} else {
+									htmlstr += `<li class="pagination_button">
+											   	   <a href="${i - 1}">${i}</a>
+										        </li>
+									`;
+								}
+							}
+							
+							if(pageNumber < totalPages - 1) {
+								htmlstr += `<li class="pagination_button">
+										       <a style="border: 0px;" href="${pageNumber + 1}">&#62;</a>
+									        </li>
+								`;
+							}
+							
+							$(".pagination").html(htmlstr);
+							
+						}, error: function(e) {
+							console.log(e);
+						}
+					});
+				} //function 닫음
+				
+				
+
+			</script>
+		</th:block>
+	</head>
+	<!-- head 영역 끝 -->
+	
+<body>
+	<div id="container" layout:fragment="content">
+		<div>
+  			<h1 id="orderAndReserAdmin">주문 및 예약 관리</h1>
+		</div>
+		
+		<div id="orderAndReserBtn">
+			<a href="reserDayclassList" id="reserDayclass">▶ 원데이클래스 예약 내역</a>
+			<a href="orderItemList" id="orderItemList">▶ 상품 주문 내역</a>
+		</div>
+		
+		<form id="searchForm" action="/admin/reserDayclassList" method="get">
+	    	<div id="reser_search">
+				<select name="searchCondition" id="searchCondition">
+					<option value="ALL" th:selected="${searchCondition == 'ALL' || searchCondition == '' || searchCondition == null}">전체</option>
+					<option value="RESERNO" th:selected="${searchCondition} == 'RESERNO'">예약번호</option>
+					<option value="PARTINAME" th:selected="${searchCondition} == 'PARTINAME'">예약자</option>
+					<option value="CLASSNO" th:selected="${searchCondition} == 'CLASSNO'">클래스번호</option>
+					<option value="PARTIDATE" th:selected="${searchCondition} == 'PARTIDATE'">예약날짜</option>
+					<option value="PARTITIME" th:selected="${searchCondition} == 'PARTITIME'">예약시간</option>
+					<option value="RESERSTATUS" th:selected="${searchCondition} == 'RESERSTATUS'">예약상태</option>
+					<option value="PARTISTATUS" th:selected="${searchCondition} == 'PARTISTATUS'">참여현황</option>
+	            </select>
+	            <input type="text" name="searchKeyword" th:value="${searchKeyword}" id="inputSearch" 
+	            	th:style="${ searchCondition != 'PARTITIME' && searchCondition != 'RESERSTATUS' && searchCondition != 'PARTISTATUS' ? 'display: inline-block;' : 'display: none;'}"
+	            	th:disabled="${ searchCondition != 'PARTITIME' && searchCondition != 'RESERSTATUS' && searchCondition != 'PARTISTATUS'} ? false : true">
+	            <select name="searchKeyword" id="selectSearch1" th:style="${searchCondition == 'PARTITIME' ? 'display: inline-block;' : 'display: none;'}"
+	            		th:disabled="${searchCondition == 'PARTITIME'} ? false : true">
+	            	<option>선택하세요.</option>
+	            	<option value="A" th:selected="${searchKeyword} == 'A'">AM</option>
+	              	<option value="P" th:selected="${searchKeyword} == 'P'">PM</option>
+	            </select>
+	            <select name="searchKeyword" id="selectSearch2" th:style="${searchCondition == 'RESERSTATUS' ? 'display: inline-block;' : 'display: none;'}"
+	            		th:disabled="${searchCondition == 'RESERSTATUS'} ? false : true">
+	            <option>선택하세요.</option>
+	            	<option value="MV" th:selected="${searchKeyword} == 'MV'">입금대기(MV)</option>
+	              	<option value="PE" th:selected="${searchKeyword} == 'PE'">결제완료(PE)</option>
+	              	<option value="RC" th:selected="${searchKeyword} == 'RC'">예약취소(RC)</option>
+	              	<option value="PC" th:selected="${searchKeyword} == 'PC'">결제취소(PC)</option>
+	            </select>
+	            <select name="searchKeyword" id="selectSearch3" th:style="${searchCondition == 'PARTISTATUS' ? 'display: inline-block;' : 'display: none;'}"
+	            		th:disabled="${searchCondition == 'PARTISTATUS'} ? false : true">
+	            <option>선택하세요.</option>
+	            	<option value="PS" th:selected="${searchKeyword} == 'PS'">진행예정(PS)</option>
+	              	<option value="PC" th:selected="${searchKeyword} == 'PC'">진행완료(PC)</option>
+	              	<option value="NS" th:selected="${searchKeyword} == 'NS'">노쇼(NS)</option>
+	              	<option value="CC" th:selected="${searchKeyword} == 'CC'">예약/결제취소(CC)</option>
+	            </select>
+	            
+				<button type="button" id="btnSearch">검색</button>
+	        </div>
+	    </form>
+	    
+		<!-- 원데이클래스 예약 리스트 Table -->
+	    <div id="div_reserList_T">
+	    	<form id="updateForm">
+		        <table border="1" id="reserList_T">
+		        	<tr>
+		        		<th class="reserList_T_15">예약번호</th>
+				        <th class="reserList_T_15">예약자</th>
+				        <th class="reserList_T_10">클래스번호</th>
+				        <th class="reserList_T_15">예약날짜</th>
+				        <th class="reserList_T_15">예약시간</th>
+				        <th class="reserList_T_15">예약상태</th>
+				        <th class="reserList_T_15">참여현황</th>
+		      		</tr>
+		      		<tr th:each="reser: ${pageReserList}">
+			        	<td>
+							<a th:href="@{/mypage/getReserDetail/{reserNo} (reserNo=${reser.reserNo})}">
+								<input type="text" readonly name="reserNo" class="reserNo" th:id="'reserNo' + ${reserStat.index}" th:value="${reser.reserNo}">
+							</a>
+						</td>
+						<td><input type="text" readonly name="partiName" class="partiName" th:id="'partiName' + ${reserStat.index}" th:value="${reser.partiName}"></td>
+						<td><input type="text" readonly name="classNo" class="classNo" th:id="'classNo' + ${reserStat.index}" th:value="${reser.classNo}"></td>
+						<td><input type="text" readonly name="partiDate" class="partiDate" th:id="'partiDate' + ${reserStat.index}" th:value="${reser.partiDate}"></td>
+						<td><input type="text" readonly name="partiTime" class="partiTime" th:id="'partiTime' + ${reserStat.index}" th:value="${reser.partiTime}"></td>
+						<td><input type="text" readonly name="reserStatus" class="reserStatus" th:id="'reserStatus' + ${reserStat.index}" th:value="${reser.reserStatus}"></td>
+						<td th:if="${reser.partiStatus} != 'PS'" th:text="${reser.partiStatus}"></td>
+						<td th:if="${reser.partiStatus} == 'PS'">
+							<select name="partiStatus" class="partiStatus" th:id="'partiStatus' + ${reserStat.index}">
+								<option value="PS">진행예정 (PS)</option>
+				        		<option value="PC">진행완료 (PC)</option>
+				        		<option value="NS">노쇼 (NS)</option>
+				        		<option value="CC">예약/결제취소 (CC)</option>
+							</select>
+							<button type="button" class="btnMod" th:id="'btnMod' + ${reserStat.index}" th:data-current-index="${reserStat.index}" name="btnMod">변경</button>
+						</td>
+			     	 </tr>
+			    </table>
+		    </form>
+		</div>
+		
+		<!-- 페이징 -->
+		<div class="paging">
+			<ul class="pagination" th:if="${pageReserList.totalElements > 0}"
+								   th:with="pageNumber = ${pageReserList.pageable.pageNumber},
+											pageSize = ${pageReserList.pageable.pageSize},
+											totalPages = ${pageReserList.totalPages},
+											startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+											tempEndPage = ${startPage + pageSize - 1},
+											endPage = ${tempEndPage > totalPages ? totalPages : tempEndPage}">
+				<li class="pagination_button" th:if="${pageNumber > 0}">
+					<a style="border: 0px;" th:href="${pageNumber - 1}">&#60;</a>
+				</li>
+				<li class="pagination_button" th:each="page : ${#numbers.sequence(totalPages - startPage < pageSize ? (totalPages < pageSize ? 1 :totalPages - pageSize + 1) : startPage, endPage)}">
+					<a th:href="${page - 1}" th:text="${page}"></a>
+				</li>
+				<li class="pagination_button" th:if="${pageNumber < totalPages - 1}">
+					<a style="border: 0px;" th:href="${pageNumber + 1}">&#62;</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</body>
+</html>
